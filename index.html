@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>FORGE — Coach Personnel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0a0a0a;--dark:#111214;--card:#18191d;--border:#2a2b30;--accent:#e8ff47;--accent2:#ff6b35;--text:#f0f0f0;--muted:#6b6d75;--success:#4ade80;--danger:#ff4757;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;max-width:430px;margin:0 auto;padding-bottom:100px;overflow-x:hidden;}
+.header{padding:20px 20px 16px;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,10,10,0.95);backdrop-filter:blur(12px);z-index:100;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:var(--accent);line-height:1;}
+.logo span{color:var(--text);}
+.week-badge{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);background:var(--card);padding:6px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;}
+.week-badge:active{border-color:var(--accent);}
+.days-strip{display:flex;gap:8px;padding:16px 20px;overflow-x:auto;scrollbar-width:none;}
+.days-strip::-webkit-scrollbar{display:none;}
+.day-tab{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:10px 14px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);transition:all 0.2s;min-width:68px;}
+.day-tab.active{background:var(--accent);border-color:var(--accent);}
+.day-tab .day-name{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.day-tab.active .day-name{color:var(--black);}
+.day-tab .day-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);line-height:1;}
+.day-tab.active .day-num{color:var(--black);}
+.day-tab.done{border-color:rgba(74,222,128,0.4);}
+.day-tab.done .day-name::after{content:' ✓';color:var(--success);}
+.day-tab.active.done .day-name::after{color:var(--black);}
+.phase-banner{margin:0 16px 12px;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.phase-accumulation{background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);color:#4ade80;}
+.phase-intensification{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);color:#fbbf24;}
+.phase-realisation{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);color:#ff6b35;}
+.phase-pic{background:rgba(232,255,71,0.08);border:1px solid rgba(232,255,71,0.2);color:var(--accent);}
+.session-header{padding:4px 20px 12px;}
+.session-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;}
+.session-subtitle{font-size:13px;color:var(--muted);margin-top:2px;}
+.coach-bar{margin:0 16px 4px;padding:8px 12px;background:rgba(232,255,71,0.05);border:1px solid rgba(232,255,71,0.15);border-radius:10px;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.exercise-card{margin:0 16px 12px;background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;}
+.exercise-card.unavailable{opacity:0.5;border-color:var(--danger);}
+.exercise-top{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 16px 10px;gap:8px;}
+.exercise-info{flex:1;}
+.exercise-name{font-weight:600;font-size:16px;line-height:1.2;}
+.exercise-muscle{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
+.muscle-chest{color:#ff6b35;}.muscle-back{color:#4fc3f7;}.muscle-shoulder{color:#a78bfa;}
+.muscle-biceps{color:#34d399;}.muscle-triceps{color:#fbbf24;}.muscle-abs{color:#f87171;}
+.exercise-actions{display:flex;gap:6px;flex-shrink:0;align-items:flex-start;}
+.yt-btn{background:#ff0000;border:none;color:white;font-size:11px;font-weight:700;padding:7px 9px;border-radius:8px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.yt-btn:active{background:#cc0000;}
+.unavail-btn{background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:600;padding:6px 10px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.unavail-btn:active{background:var(--danger);border-color:var(--danger);color:white;}
+.sets-section{padding:4px 16px 16px;}
+.sets-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.sets-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+.rest-btn{background:rgba(232,255,71,0.1);border:1px solid rgba(232,255,71,0.3);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:1px;}
+.sets-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.set-block{background:var(--black);border:1.5px solid var(--border);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;flex:1;min-width:80px;max-width:100px;}
+.set-block.filled{border-color:rgba(232,255,71,0.4);}
+.set-num{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--muted);letter-spacing:1px;}
+.set-inputs{display:flex;flex-direction:column;gap:5px;}
+.mini-input-wrap{position:relative;}
+.mini-label{position:absolute;top:3px;left:7px;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.mini-input{width:100%;background:var(--dark);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;padding:18px 6px 4px;text-align:center;-webkit-appearance:none;appearance:none;outline:none;-moz-appearance:textfield;}
+.mini-input:focus{border-color:var(--accent);}
+.mini-input::-webkit-inner-spin-button,.mini-input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.add-set-btn{background:var(--dark);border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);font-size:22px;cursor:pointer;flex:1;min-width:50px;max-width:60px;display:flex;align-items:center;justify-content:center;min-height:88px;}
+.add-set-btn:active{border-color:var(--accent);color:var(--accent);}
+.session-footer{margin:8px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;}
+.footer-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;}
+.feeling-row{display:flex;gap:8px;margin-bottom:16px;}
+.feeling-btn{flex:1;background:var(--dark);border:1.5px solid var(--border);border-radius:12px;padding:10px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.feeling-btn.selected{border-color:var(--accent);background:rgba(232,255,71,0.07);}
+.feeling-btn .emoji{font-size:22px;}
+.feeling-btn .flbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);}
+.feeling-btn.selected .flbl{color:var(--accent);}
+.comment-area{width:100%;background:var(--dark);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;resize:none;height:80px;outline:none;}
+.comment-area:focus{border-color:var(--accent);}
+.comment-area::placeholder{color:var(--muted);}
+.save-btn{display:block;width:calc(100% - 32px);margin:14px 16px 0;background:var(--accent);color:var(--black);border:none;border-radius:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;padding:16px;cursor:pointer;}
+.save-btn:active{transform:scale(0.98);opacity:0.85;}
+.save-btn:disabled{opacity:0.5;cursor:not-allowed;}
+/* REST TIMER */
+.rest-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.93);backdrop-filter:blur(10px);z-index:250;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.rest-overlay.open{opacity:1;pointer-events:all;}
+.rest-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--muted);margin-bottom:6px;}
+.rest-exname{font-size:15px;font-weight:600;color:var(--text);margin-bottom:30px;text-align:center;padding:0 32px;}
+.rest-ring{position:relative;width:200px;height:200px;margin-bottom:28px;}
+.rest-ring svg{width:200px;height:200px;transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:8;}
+.ring-prog{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+.ring-prog.danger{stroke:var(--danger);}
+.rest-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.rest-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--accent);line-height:1;}
+.rest-num.danger{color:var(--danger);}
+.rest-unit-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:2px;}
+.rest-btns{display:flex;gap:12px;}
+.rest-add{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;padding:14px 20px;cursor:pointer;}
+.rest-skip{background:var(--accent);color:var(--black);border:none;border-radius:50px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:14px 32px;cursor:pointer;}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--dark);border:1px solid var(--border);border-radius:24px 24px 0 0;width:100%;max-width:430px;margin:0 auto;padding:24px 20px 40px;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent2);margin-bottom:6px;}
+.modal-subtitle{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.alt-option{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;}
+.alt-option:active{border-color:var(--accent);}
+.alt-name{font-weight:600;font-size:15px;}
+.alt-detail{font-size:12px;color:var(--muted);margin-top:3px;}
+.modal-close{width:100%;margin-top:8px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px;border-radius:12px;cursor:pointer;}
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--success);color:var(--black);font-weight:700;font-size:14px;padding:12px 24px;border-radius:40px;z-index:300;opacity:0;transition:all 0.3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{background:var(--danger);color:white;}
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(10,10,10,0.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-around;z-index:100;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 12px;border-radius:10px;}
+.nav-item .nav-icon{font-size:20px;color:var(--muted);}
+.nav-item .nav-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.nav-item.active .nav-icon,.nav-item.active .nav-label{color:var(--accent);}
+.page{display:none;}.page.active{display:block;}
+/* STATS PAGE */
+.stats-header{padding:20px 20px 8px;}
+.stats-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;}
+.stats-subtitle{font-size:13px;color:var(--muted);margin-top:2px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);line-height:1;}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:8px 16px 8px;}
+.history-item{margin:0 16px 8px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+.h-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.h-date{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.h-feel{font-size:18px;}
+.h-name{font-size:15px;font-weight:600;margin-top:3px;}
+.h-comment{font-size:12px;color:var(--muted);margin-top:6px;font-style:italic;}
+.h-sets{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;}
+.h-set-chip{background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:11px;color:var(--muted);}
+.h-set-chip strong{color:var(--text);}
+.chart-wrap{margin:0 16px 16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.chart-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px;}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bar{width:100%;background:var(--accent);border-radius:4px 4px 0 0;min-height:4px;transition:height 0.3s;}
+.bar-lbl{font-size:9px;color:var(--muted);font-weight:600;}
+.pr-card{margin:0 16px 8px;background:var(--card);border:1px solid rgba(232,255,71,0.2);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.pr-icon{font-size:24px;}
+.pr-info .pr-ex{font-weight:600;font-size:14px;}
+.pr-info .pr-val{font-size:12px;color:var(--accent);margin-top:2px;}
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;background:var(--black);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.loading-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:6px;color:var(--accent);}
+.loading-bar{width:120px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.loading-fill{height:100%;background:var(--accent);border-radius:2px;animation:load 1.5s ease-in-out infinite;}
+@keyframes load{0%{width:0%;}50%{width:80%;}100%{width:100%;}}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">FORGE</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+</div>
+
+<div class="header">
+  <div class="logo">FORGE<span>.</span></div>
+  <div class="week-badge" id="weekBadge" onclick="showWeekInfo()">Semaine 1</div>
+</div>
+
+<!-- PAGE SEANCE -->
+<div class="page active" id="pageWorkout">
+  <div class="days-strip" id="dayStrip"></div>
+  <div id="sessionContent"></div>
+</div>
+
+<!-- PAGE STATS -->
+<div class="page" id="pageStats">
+  <div class="stats-header">
+    <div class="stats-title">Progression</div>
+    <div class="stats-subtitle">Tes performances dans le temps</div>
+  </div>
+  <div class="stat-grid" id="statsGrid"></div>
+  <div id="prSection"></div>
+  <div id="chartSection"></div>
+  <div class="section-title">Historique des seances</div>
+  <div id="historyList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="navWorkout" onclick="showPage('workout')">
+    <div class="nav-icon">&#127947;</div>
+    <div class="nav-label">Seance</div>
+  </div>
+  <div class="nav-item" id="navStats" onclick="showPage('stats')">
+    <div class="nav-icon">&#128200;</div>
+    <div class="nav-label">Stats</div>
+  </div>
+</div>
+
+<!-- REST TIMER -->
+<div class="rest-overlay" id="restOverlay">
+  <div class="rest-tag">Temps de repos</div>
+  <div class="rest-exname" id="restExName"></div>
+  <div class="rest-ring">
+    <svg viewBox="0 0 200 200">
+      <circle class="ring-bg" cx="100" cy="100" r="88"/>
+      <circle class="ring-prog" id="ringProg" cx="100" cy="100" r="88" stroke-dasharray="552.9" stroke-dashoffset="0"/>
+    </svg>
+    <div class="rest-center">
+      <div class="rest-num" id="restNum">90</div>
+      <div class="rest-unit-lbl">secondes</div>
+    </div>
+  </div>
+  <div class="rest-btns">
+    <button class="rest-add" onclick="restAdd()">+30s</button>
+    <button class="rest-skip" onclick="restSkip()">C'EST PARTI</button>
+  </div>
+</div>
+
+<!-- MODAL INDISPO -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-subtitle" id="modalSubtitle"></div>
+    <div id="modalOptions"></div>
+    <button class="modal-close" onclick="closeModal()">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL SEMAINE INFO -->
+<div class="modal-overlay" id="weekModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="weekModalTitle"></div>
+    <div id="weekModalBody" style="font-size:14px;color:var(--muted);line-height:1.7;"></div>
+    <button class="modal-close" onclick="closeWeekModal()" style="margin-top:16px;">Fermer</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG SUPABASE ───────────────────────────────────────────────────────────
+var SUPA_URL = 'https://dbqqtyelqonkkvksgatx.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRicXF0eWVscW9ua2t2a3NnYXR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NDEzMDgsImV4cCI6MjA4ODExNzMwOH0.pvwJCsKBTPta9cAVeWRHct1gSZqN9dQeROdjWOXMdkY';
+
+function supa(path, opts) {
+  var url = SUPA_URL + '/rest/v1/' + path;
+  var headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+  return fetch(url, Object.assign({ headers: headers }, opts || {})).then(function(r) {
+    if (!r.ok) return r.text().then(function(t) { throw new Error(t); });
+    return r.status === 204 ? null : r.json();
+  });
+}
+
+// ── PROGRAMME ────────────────────────────────────────────────────────────────
+var FEELINGS = [
+  {emoji:'😴',label:'Epuise', val:1},
+  {emoji:'😐',label:'Moyen',  val:2},
+  {emoji:'💪',label:'Bien',   val:3},
+  {emoji:'🔥',label:'En feu!',val:4}
+];
+
+// Programme de base — evolue avec la phase
+var BASE_PROGRAM = [
+  {
+    id:'A', name:'PUSH', subtitle:'Poitrine - Epaules - Triceps',
+    exercises:[
+      {id:'bench',       name:'Developpe couche',          muscle:'chest',    muscleLabel:'Poitrine',        defaultSets:4,defaultReps:10,defaultWeight:60, restSec:120,
+       youtube:'https://www.youtube.com/results?search_query=developpe+couche+technique+musculation',
+       alts:[{name:'Developpe incline halteres',detail:'Meme groupe musculaire'},{name:'Pompes lestees',detail:'Si banc indisponible'}]},
+      {id:'incline_db',  name:'Developpe incline halteres',muscle:'chest',    muscleLabel:'Poitrine haute',  defaultSets:3,defaultReps:12,defaultWeight:22, restSec:90,
+       youtube:'https://www.youtube.com/results?search_query=developpe+incline+halteres+technique',
+       alts:[{name:'Developpe incline barre',detail:'Meme mouvement'},{name:'Cables croises haut',detail:'Isolation pectorale'}]},
+      {id:'ohp',         name:'Developpe militaire barre', muscle:'shoulder', muscleLabel:'Epaules',         defaultSets:4,defaultReps:8, defaultWeight:40, restSec:120,
+       youtube:'https://www.youtube.com/results?search_query=developpe+militaire+technique+musculation',
+       alts:[{name:'Developpe militaire halteres',detail:'Meilleure amplitude'},{name:'Arnold press',detail:'Complet pour les deltoides'}]},
+      {id:'lat_raise',   name:'Elevations laterales',      muscle:'shoulder', muscleLabel:'Deltoides',       defaultSets:3,defaultReps:15,defaultWeight:10, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=elevations+laterales+epaules+technique',
+       alts:[{name:'Elevations cable',detail:'Tension constante'},{name:'Machine epaules lateral',detail:'Guide'}]},
+      {id:'triceps_push',name:'Triceps poulie haute',      muscle:'triceps',  muscleLabel:'Triceps',         defaultSets:3,defaultReps:12,defaultWeight:30, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=triceps+poulie+haute+technique',
+       alts:[{name:'Dips paralleles',detail:'Poids du corps'},{name:'Extensions triceps haltere',detail:'Skull crusher allege'}]}
+    ]
+  },
+  {
+    id:'B', name:'PULL', subtitle:'Dos - Biceps - Epaules arriere',
+    exercises:[
+      {id:'pullup',      name:'Tractions pull-ups',        muscle:'back',     muscleLabel:'Dos large',       defaultSets:4,defaultReps:8, defaultWeight:0,  restSec:120,
+       youtube:'https://www.youtube.com/results?search_query=tractions+pull+ups+technique',
+       alts:[{name:'Tirage vertical machine',detail:'Charge ajustable'},{name:'Tirage poulie haute large',detail:'Excellent substitut'}]},
+      {id:'row_cable',   name:'Tirage horizontal cable',   muscle:'back',     muscleLabel:'Dos milieu',      defaultSets:4,defaultReps:10,defaultWeight:50, restSec:90,
+       youtube:'https://www.youtube.com/results?search_query=tirage+horizontal+cable+dos+technique',
+       alts:[{name:'Rowing haltere 1 bras',detail:'Unilateral'},{name:'Rowing barre',detail:'Charge plus lourde'}]},
+      {id:'facepull',    name:'Face pull cable',           muscle:'shoulder', muscleLabel:'Deltoide post.',  defaultSets:3,defaultReps:15,defaultWeight:20, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=face+pull+cable+epaules+technique',
+       alts:[{name:'Oiseau halteres',detail:'Elevation arriere inclinee'},{name:'Ecartes machine',detail:'Isole les deltoides'}]},
+      {id:'curl_bar',    name:'Curl barre EZ',             muscle:'biceps',   muscleLabel:'Biceps',          defaultSets:3,defaultReps:12,defaultWeight:30, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=curl+barre+EZ+biceps+technique',
+       alts:[{name:'Curl halteres alternes',detail:'Supination naturelle'},{name:'Curl cable bas',detail:'Tension en fin de mouvement'}]},
+      {id:'hammer',      name:'Hammer curl halteres',      muscle:'biceps',   muscleLabel:'Brachial',        defaultSets:3,defaultReps:12,defaultWeight:14, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=hammer+curl+halteres+technique',
+       alts:[{name:'Curl cable corde',detail:'Meme prise neutre'},{name:'Curl marteau machine',detail:'Guide'}]}
+    ]
+  },
+  {
+    id:'C', name:'PUSH+', subtitle:'Poitrine heavy - Triceps - Abdos',
+    exercises:[
+      {id:'dips',        name:'Dips lestes',               muscle:'chest',    muscleLabel:'Poitrine basse',  defaultSets:4,defaultReps:8, defaultWeight:10, restSec:120,
+       youtube:'https://www.youtube.com/results?search_query=dips+lestes+poitrine+technique',
+       alts:[{name:'Dips poids du corps',detail:'Sans lest'},{name:'Pec deck machine',detail:'Isolation poitrine basse'}]},
+      {id:'chest_fly',   name:'Ecartes cables croises',    muscle:'chest',    muscleLabel:'Poitrine isol.',  defaultSets:3,defaultReps:15,defaultWeight:15, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=ecartes+cables+croises+poitrine',
+       alts:[{name:'Ecartes halteres plat',detail:'Bon etirement'},{name:'Pec deck machine',detail:'Finisher guide'}]},
+      {id:'front_raise', name:'Elevations frontales',      muscle:'shoulder', muscleLabel:'Deltoide ant.',   defaultSets:3,defaultReps:12,defaultWeight:10, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=elevations+frontales+epaules+technique',
+       alts:[{name:'Elevations frontales cable',detail:'Tension constante'},{name:'Incline halteres',detail:'Variante sur banc'}]},
+      {id:'skull',       name:'Skull crusher EZ',          muscle:'triceps',  muscleLabel:'Triceps long',    defaultSets:3,defaultReps:12,defaultWeight:25, restSec:90,
+       youtube:'https://www.youtube.com/results?search_query=skull+crusher+triceps+technique',
+       alts:[{name:'Extensions haltere tete',detail:'Overhead, bon stretch'},{name:'Triceps poulie corde',detail:'Finisher isolation'}]},
+      {id:'abs_planche', name:'Gainage dynamique',         muscle:'abs',      muscleLabel:'Abdos',           defaultSets:3,defaultReps:45,defaultWeight:0,  restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=gainage+planche+abdominaux+technique',
+       alts:[{name:'Ab roller',detail:'Plus intense'},{name:'Crunchs cable',detail:'Avec charge'}]}
+    ]
+  },
+  {
+    id:'D', name:'PULL+', subtitle:'Dos epais - Biceps - Trapezes',
+    exercises:[
+      {id:'deadlift',    name:'Souleve de terre roumain',  muscle:'back',     muscleLabel:'Ischios / Bas dos',defaultSets:4,defaultReps:8, defaultWeight:70, restSec:150,
+       youtube:'https://www.youtube.com/results?search_query=souleve+de+terre+roumain+technique',
+       alts:[{name:'Good morning',detail:'Charge plus legere'},{name:'Extension dos machine',detail:'Isole le bas du dos'}]},
+      {id:'row_machine', name:'Rowing machine prise neutre',muscle:'back',    muscleLabel:'Dos epais',       defaultSets:4,defaultReps:10,defaultWeight:60, restSec:90,
+       youtube:'https://www.youtube.com/results?search_query=rowing+machine+dos+technique',
+       alts:[{name:'T-bar row',detail:'Excellent epaisseur dorsale'},{name:'Rowing haltere penche',detail:'Variante libre'}]},
+      {id:'shrug',       name:'Shrugs halteres',           muscle:'back',     muscleLabel:'Trapezes',        defaultSets:3,defaultReps:15,defaultWeight:30, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=shrugs+trapezes+technique',
+       alts:[{name:'Shrugs barre',detail:'Plus de charge'},{name:'Shrugs cable',detail:'Tension constante'}]},
+      {id:'curl_machine',name:'Curl concentration machine',muscle:'biceps',   muscleLabel:'Biceps pic',      defaultSets:3,defaultReps:12,defaultWeight:25, restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=curl+concentration+biceps+technique',
+       alts:[{name:'Curl pupitre haltere',detail:'Meme isolation'},{name:'Curl cable supination',detail:'Tension position basse'}]},
+      {id:'abs_hanging', name:'Releves de jambes suspendu',muscle:'abs',      muscleLabel:'Abdos bas',       defaultSets:3,defaultReps:12,defaultWeight:0,  restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=releves+jambes+suspendu+abdominaux',
+       alts:[{name:'Releves de jambes sol',detail:'Variante au sol'},{name:'Crunchs inverses',detail:'Abdos bas'}]}
+    ]
+  }
+];
+
+// Phases de periodisation (16 semaines vers juin)
+var PHASES = {
+  accumulation:  {name:'Accumulation',  color:'phase-accumulation',  emoji:'🌱', desc:'Volume eleve, technique parfaite. On construit la base.'},
+  intensification:{name:'Intensification',color:'phase-intensification',emoji:'⚡',desc:'Charges en hausse, volume modere. On gagne en force.'},
+  realisation:   {name:'Realisation',   color:'phase-realisation',   emoji:'🔥', desc:'Charges lourdes, faible volume. On exprime la force.'},
+  pic:           {name:'Pic',           color:'phase-pic',           emoji:'🏆', desc:'Objectif juin atteint. Maintien et definition.'}
+};
+
+function getPhase(weekNum) {
+  if (weekNum <= 4)  return 'accumulation';
+  if (weekNum <= 8)  return 'intensification';
+  if (weekNum <= 12) return 'realisation';
+  return 'pic';
+}
+
+// Ajustement du programme selon la phase
+function getProgram(weekNum) {
+  var phase = getPhase(weekNum);
+  var pw = weekNum <= 4 ? weekNum : weekNum <= 8 ? weekNum-4 : weekNum <= 12 ? weekNum-8 : weekNum-12;
+  return BASE_PROGRAM.map(function(day) {
+    return Object.assign({}, day, {
+      exercises: day.exercises.map(function(ex) {
+        var sets = ex.defaultSets, reps = ex.defaultReps;
+        if (phase === 'accumulation') {
+          sets = ex.defaultSets; reps = Math.max(8, ex.defaultReps + (4-pw));
+        } else if (phase === 'intensification') {
+          sets = ex.defaultSets + 1; reps = Math.max(6, ex.defaultReps - 2);
+        } else if (phase === 'realisation') {
+          sets = ex.defaultSets + 1; reps = Math.max(4, ex.defaultReps - 4);
+        } else {
+          sets = ex.defaultSets; reps = ex.defaultReps;
+        }
+        return Object.assign({}, ex, {defaultSets: sets, defaultReps: reps});
+      })
+    });
+  });
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var state = {
+  currentDay: 0,
+  currentWeek: 1,
+  currentSets: {},   // {exId: [{reps, weight}]}
+  currentFeeling: null,
+  currentComment: '',
+  unavailable: {},
+  allSessions: [],   // loaded from supabase
+  allSets: [],       // loaded from supabase
+  phaseInfo: null
+};
+
+var CIRC = 2 * Math.PI * 88;
+
+// ── SUPABASE API ──────────────────────────────────────────────────────────────
+
+function loadData() {
+  return Promise.all([
+    supa('sessions?select=*&order=created_at.desc'),
+    supa('sets?select=*'),
+    supa('program_weeks?select=*&order=week_num.desc&limit=1')
+  ]).then(function(results) {
+    state.allSessions = results[0] || [];
+    state.allSets     = results[1] || [];
+    var weeks         = results[2] || [];
+    if (weeks.length > 0) {
+      state.currentWeek = weeks[0].week_num;
+      state.phaseInfo   = weeks[0];
+    }
+    // Check if all 4 sessions done this week → auto increment
+    var thisWeekSessions = state.allSessions.filter(function(s) { return s.week_num === state.currentWeek; });
+    var doneIndices = thisWeekSessions.map(function(s) { return s.day_index; });
+    var allDone = [0,1,2,3].every(function(i) { return doneIndices.indexOf(i) !== -1; });
+    if (allDone) {
+      state.currentWeek++;
+    }
+  });
+}
+
+function saveSession() {
+  var di = state.currentDay;
+  var prog = getProgram(state.currentWeek)[di];
+  var btn = document.getElementById('saveBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde...'; }
+
+  var sessionData = {
+    week_num: state.currentWeek,
+    day_index: di,
+    session_name: prog.name,
+    session_subtitle: prog.subtitle,
+    feeling: state.currentFeeling,
+    comment: state.currentComment
+  };
+
+  supa('sessions', {
+    method: 'POST',
+    body: JSON.stringify(sessionData)
+  }).then(function(sessions) {
+    var sessionId = sessions[0].id;
+    var setsToInsert = [];
+    Object.keys(state.currentSets).forEach(function(exId) {
+      state.currentSets[exId].forEach(function(s, i) {
+        if (s.reps || s.weight) {
+          var exName = '';
+          BASE_PROGRAM.forEach(function(p) {
+            p.exercises.forEach(function(e) { if (e.id === exId) exName = e.name; });
+          });
+          setsToInsert.push({
+            session_id: sessionId,
+            exercise_id: exId,
+            exercise_name: exName,
+            set_index: i,
+            reps: s.reps ? parseInt(s.reps) : null,
+            weight: s.weight ? parseFloat(s.weight) : null
+          });
+        }
+      });
+    });
+    if (setsToInsert.length === 0) return Promise.resolve([]);
+    return supa('sets', { method: 'POST', body: JSON.stringify(setsToInsert) });
+  }).then(function() {
+    toast('Seance sauvegardee !');
+    state.currentSets = {};
+    state.currentFeeling = null;
+    state.currentComment = '';
+    return loadData();
+  }).then(function() {
+    renderDayStrip();
+    renderSession();
+    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer la seance'; }
+  }).catch(function(e) {
+    toast('Erreur : ' + e.message, true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer la seance'; }
+  });
+}
+
+// ── COACH LOGIC ───────────────────────────────────────────────────────────────
+
+function getCoachSuggestion(exId, defWeight, defReps) {
+  var exSets = state.allSets.filter(function(s) { return s.exercise_id === exId && s.reps; });
+  if (!exSets.length) return {weight: defWeight, reps: defReps, isNew: true};
+  var recent = exSets.slice(-8);
+  var maxW = Math.max.apply(null, recent.map(function(s) { return parseFloat(s.weight) || 0; }));
+  var avgR = Math.round(recent.reduce(function(a,s) { return a + (parseInt(s.reps)||0); }, 0) / recent.length);
+  if (avgR >= defReps) return {weight: maxW+2.5, reps: defReps, isNew: false, msg: '+2.5kg vs precedent'};
+  return {weight: maxW, reps: Math.min(avgR+1, defReps), isNew: false, msg: 'Maintiens, +1 rep vise'};
+}
+
+function isDone(dayIdx) {
+  return state.allSessions.some(function(s) {
+    return s.week_num === state.currentWeek && s.day_index === dayIdx;
+  });
+}
+
+function frest(s) {
+  if (s >= 60) { var m = Math.floor(s/60), r = s%60; return m+'min'+(r?r+'s':''); }
+  return s+'s';
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+
+function renderDayStrip() {
+  var h = '';
+  var prog = getProgram(state.currentWeek);
+  for (var i = 0; i < 4; i++) {
+    var p = prog[i];
+    var a = i === state.currentDay;
+    var dn = isDone(i);
+    h += '<div class="day-tab'+(a?' active':'')+(dn?' done':'')+'" onclick="switchDay('+i+')">'
+        +'<div class="day-name">Seance'+(dn?' ✓':'')+'</div>'
+        +'<div class="day-num">'+(i+1)+'</div>'
+        +'</div>';
+  }
+  document.getElementById('dayStrip').innerHTML = h;
+  document.getElementById('weekBadge').textContent = 'Semaine '+state.currentWeek;
+}
+
+function renderSession() {
+  var di   = state.currentDay;
+  var prog = getProgram(state.currentWeek);
+  var day  = prog[di];
+  var phase = getPhase(state.currentWeek);
+  var phaseData = PHASES[phase];
+  var h = '';
+
+  h += '<div class="phase-banner '+phaseData.color+'">'+phaseData.emoji+' Phase '+phaseData.name+' — Semaine '+state.currentWeek+'</div>';
+  h += '<div class="session-header">'
+      +'<div class="session-title">'+day.name+' &mdash; Seance '+(di+1)+'</div>'
+      +'<div class="session-subtitle">'+day.subtitle+'</div>'
+      +'</div>';
+
+  day.exercises.forEach(function(ex) {
+    var unavail = !!state.unavailable[ex.id];
+    var sets    = state.currentSets[ex.id] || [{}];
+    var c       = getCoachSuggestion(ex.id, ex.defaultWeight, ex.defaultReps);
+    var rest    = frest(ex.restSec);
+    var cmsg    = c.isNew
+      ? 'Objectif : '+(ex.defaultWeight>0?ex.defaultWeight+'kg x ':'')+ex.defaultReps+' rep x '+ex.defaultSets+' series'
+      : c.msg+' — '+(c.weight>0?c.weight+'kg x ':'')+c.reps+' rep';
+
+    h += '<div class="coach-bar">&#127919; '+cmsg+' &nbsp;&middot;&nbsp; &#9201; Repos : <strong style="color:var(--text)">'+rest+'</strong></div>';
+    h += '<div class="exercise-card'+(unavail?' unavailable':'')+'" id="card-'+ex.id+'">'
+        +'<div class="exercise-top">'
+          +'<div class="exercise-info">'
+            +'<div class="exercise-name">'+ex.name+'</div>'
+            +'<div class="exercise-muscle muscle-'+ex.muscle+'">'+ex.muscleLabel+'</div>'
+          +'</div>'
+          +'<div class="exercise-actions">'
+            +'<a class="yt-btn" href="'+ex.youtube+'" target="_blank" rel="noopener">&#9654; Tuto</a>'
+            +'<button class="unavail-btn" onclick="openModal(\''+ex.id+'\')">'+( unavail?'&#128260;':'&#9888;')+'</button>'
+          +'</div>'
+        +'</div>'
+        +'<div class="sets-section">'
+          +'<div class="sets-header">'
+            +'<div class="sets-label">Series</div>'
+            +'<button class="rest-btn" onclick="startRest(\''+ex.id+'\')">&#9201; '+rest+'</button>'
+          +'</div>'
+          +'<div class="sets-grid" id="sets-'+ex.id+'">';
+    sets.forEach(function(s,i) { h += mkSet(ex.id,i,s,c); });
+    h += '<button class="add-set-btn" onclick="addSet(\''+ex.id+'\')">+</button>'
+        +'</div></div></div>';
+  });
+
+  var feel = state.currentFeeling;
+  h += '<div class="session-footer">'
+      +'<div class="footer-label">Ressenti de la seance</div>'
+      +'<div class="feeling-row">';
+  FEELINGS.forEach(function(f) {
+    h += '<button class="feeling-btn'+(feel===f.val?' selected':'')+'" onclick="setFeel('+f.val+')">'
+        +'<span class="emoji">'+f.emoji+'</span>'
+        +'<span class="flbl">'+f.label+'</span>'
+        +'</button>';
+  });
+  h += '</div>'
+      +'<textarea class="comment-area" placeholder="Commentaire, sensation, douleur..." '
+      +'onchange="state.currentComment=this.value">'+(state.currentComment||'')+'</textarea>'
+      +'</div>';
+  h += '<button class="save-btn" id="saveBtn" onclick="saveSession()">&#128190; Enregistrer la seance</button>';
+
+  document.getElementById('sessionContent').innerHTML = h;
+}
+
+function mkSet(exId, i, s, c) {
+  var filled = s.reps || s.weight;
+  var rh = i===0&&c ? c.reps : '';
+  var wh = i===0&&c&&c.weight>0 ? c.weight : '';
+  return '<div class="set-block'+(filled?' filled':'')+'" id="sb-'+exId+'-'+i+'">'
+        +'<div class="set-num">SER. '+(i+1)+'</div>'
+        +'<div class="set-inputs">'
+          +'<div class="mini-input-wrap"><div class="mini-label">REPS</div>'
+          +'<input class="mini-input" type="number" min="1" max="100" value="'+(s.reps||'')+'" placeholder="'+rh+'" '
+          +'oninput="updSet(\''+exId+'\','+i+',\'reps\',this.value)"></div>'
+          +'<div class="mini-input-wrap"><div class="mini-label">KG</div>'
+          +'<input class="mini-input" type="number" min="0" max="300" step="0.5" value="'+(s.weight!==undefined&&s.weight!==null?s.weight:'')+'" placeholder="'+wh+'" '
+          +'oninput="updSet(\''+exId+'\','+i+',\'weight\',this.value)"></div>'
+        +'</div></div>';
+}
+
+// ── STATS RENDER ──────────────────────────────────────────────────────────────
+
+function renderStats() {
+  var total   = state.allSessions.length;
+  var weeks   = state.currentWeek;
+  var lf      = state.allSessions[0] ? state.allSessions[0].feeling : null;
+  var fe      = lf ? (FEELINGS.filter(function(f){return f.val===lf;})[0]||{}).emoji||'-' : '-';
+  var totalKg = state.allSets.reduce(function(a,s){return a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0);},0);
+  var ass     = total > 0 ? Math.min(100, Math.round((total / (weeks*4))*100)) : 0;
+
+  document.getElementById('statsGrid').innerHTML =
+    '<div class="stat-card"><div class="stat-val">'+total+'</div><div class="stat-lbl">Seances</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+weeks+'</div><div class="stat-lbl">Semaine</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+fe+'</div><div class="stat-lbl">Dernier ressenti</div></div>'+
+    '<div class="stat-card"><div class="stat-val">'+ass+'%</div><div class="stat-lbl">Assiduite</div></div>';
+
+  // PRs par exercice
+  var prs = {};
+  state.allSets.forEach(function(s) {
+    var key = s.exercise_id;
+    var w = parseFloat(s.weight)||0;
+    if (!prs[key] || w > prs[key].weight) prs[key] = {name: s.exercise_name, weight: w, reps: s.reps};
+  });
+  var prKeys = Object.keys(prs).filter(function(k){return prs[k].weight>0;}).sort(function(a,b){return prs[b].weight-prs[a].weight;}).slice(0,4);
+  var prHtml = '<div class="section-title">Records personnels (PR)</div>';
+  if (prKeys.length === 0) {
+    prHtml += '<div class="empty-state"><div class="empty-icon">🏆</div><p>Tes records apparaitront ici apres ta premiere seance.</p></div>';
+  } else {
+    prKeys.forEach(function(k) {
+      var pr = prs[k];
+      prHtml += '<div class="pr-card"><div class="pr-icon">🏆</div><div class="pr-info">'
+               +'<div class="pr-ex">'+pr.name+'</div>'
+               +'<div class="pr-val">'+pr.weight+'kg x '+pr.reps+' reps</div>'
+               +'</div></div>';
+    });
+  }
+  document.getElementById('prSection').innerHTML = prHtml;
+
+  // Volume par semaine (bar chart)
+  var volByWeek = {};
+  state.allSessions.forEach(function(ses) {
+    var w = ses.week_num;
+    if (!volByWeek[w]) volByWeek[w] = 0;
+    var sesSets = state.allSets.filter(function(s){return s.session_id===ses.id;});
+    sesSets.forEach(function(s){ volByWeek[w] += (parseFloat(s.weight)||0)*(parseInt(s.reps)||0); });
+  });
+  var weekNums = Object.keys(volByWeek).map(Number).sort(function(a,b){return a-b;}).slice(-6);
+  var maxVol = Math.max.apply(null, weekNums.map(function(w){return volByWeek[w]||0;})) || 1;
+  var chartHtml = '<div class="chart-wrap"><div class="chart-title">Volume par semaine (kg)</div><div class="chart-bars">';
+  if (weekNums.length === 0) {
+    chartHtml += '<div style="color:var(--muted);font-size:13px;padding:20px 0">Pas encore de donnees</div>';
+  } else {
+    weekNums.forEach(function(w) {
+      var v = volByWeek[w]||0;
+      var h = Math.round((v/maxVol)*80);
+      chartHtml += '<div class="bar-wrap"><div class="bar" style="height:'+h+'px"></div><div class="bar-lbl">S'+w+'</div></div>';
+    });
+  }
+  chartHtml += '</div></div>';
+  document.getElementById('chartSection').innerHTML = chartHtml;
+
+  // Historique
+  if (!state.allSessions.length) {
+    document.getElementById('historyList').innerHTML = '<div class="empty-state"><div class="empty-icon">&#127947;</div><p>Lance ta premiere seance !</p></div>';
+    return;
+  }
+  var h = '';
+  state.allSessions.slice(0,20).forEach(function(ses) {
+    var f = FEELINGS.filter(function(x){return x.val===ses.feeling;})[0];
+    var sesSets = state.allSets.filter(function(s){return s.session_id===ses.id;});
+    var grouped = {};
+    sesSets.forEach(function(s){if(!grouped[s.exercise_id])grouped[s.exercise_id]={name:s.exercise_name,sets:[]};grouped[s.exercise_id].sets.push(s);});
+    var setsHtml = '<div class="h-sets">';
+    Object.keys(grouped).forEach(function(k){
+      var g=grouped[k];
+      var maxW=Math.max.apply(null,g.sets.map(function(s){return parseFloat(s.weight)||0;}));
+      setsHtml+='<div class="h-set-chip">'+g.name+': <strong>'+(maxW>0?maxW+'kg':'PC')+'</strong></div>';
+    });
+    setsHtml += '</div>';
+    var d = new Date(ses.created_at);
+    var dl = d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+    h += '<div class="history-item">'
+        +'<div class="h-top"><div class="h-date">'+dl+' — Sem. '+ses.week_num+'</div><div class="h-feel">'+(f?f.emoji:'')+'</div></div>'
+        +'<div class="h-name">'+ses.session_name+'</div>'
+        +(ses.comment?'<div class="h-comment">'+ses.comment+'</div>':'')
+        +setsHtml
+        +'</div>';
+  });
+  document.getElementById('historyList').innerHTML = h;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+
+function switchDay(i) { state.currentDay=i; renderDayStrip(); renderSession(); window.scrollTo(0,0); }
+
+function updSet(exId, si, field, val) {
+  if (!state.currentSets[exId]) state.currentSets[exId] = [{}];
+  while (state.currentSets[exId].length <= si) state.currentSets[exId].push({});
+  state.currentSets[exId][si][field] = val==='' ? undefined : +val;
+  var b = document.getElementById('sb-'+exId+'-'+si);
+  if (b) { var s=state.currentSets[exId][si]; b.classList.toggle('filled',!!(s.reps||s.weight)); }
+}
+
+function addSet(exId) {
+  if (!state.currentSets[exId]) state.currentSets[exId] = [{}];
+  var idx = state.currentSets[exId].length;
+  state.currentSets[exId].push({});
+  var grid = document.getElementById('sets-'+exId);
+  var c = getCoachSuggestion(exId,10,10);
+  var t = document.createElement('div');
+  t.innerHTML = mkSet(exId,idx,{},c);
+  grid.insertBefore(t.firstElementChild, grid.lastElementChild);
+}
+
+function setFeel(val) {
+  state.currentFeeling = val;
+  document.querySelectorAll('.feeling-btn').forEach(function(b,i){b.classList.toggle('selected',FEELINGS[i].val===val);});
+}
+
+function showWeekInfo() {
+  var phase = getPhase(state.currentWeek);
+  var pd = PHASES[phase];
+  var pw = state.currentWeek <= 4 ? state.currentWeek : state.currentWeek <= 8 ? state.currentWeek-4 : state.currentWeek <= 12 ? state.currentWeek-8 : state.currentWeek-12;
+  document.getElementById('weekModalTitle').textContent = pd.emoji+' '+pd.name+' — Semaine '+state.currentWeek;
+  document.getElementById('weekModalBody').innerHTML =
+    '<p style="margin-bottom:12px">'+pd.desc+'</p>'
+    +'<p style="margin-bottom:8px"><strong style="color:var(--text)">Semaine de phase :</strong> '+pw+' / 4</p>'
+    +'<p style="margin-bottom:8px"><strong style="color:var(--text)">Objectif :</strong> Atteindre le physique cible d\'ici juin 2025</p>'
+    +'<p style="margin-bottom:8px"><strong style="color:var(--text)">Plan :</strong><br>'
+    +'&#127807; Sem 1-4 : Accumulation<br>'
+    +'&#9889; Sem 5-8 : Intensification<br>'
+    +'&#128293; Sem 9-12 : Realisation<br>'
+    +'&#127942; Sem 13+ : Pic et maintien</p>';
+  document.getElementById('weekModal').classList.add('open');
+}
+function closeWeekModal() { document.getElementById('weekModal').classList.remove('open'); }
+
+// ── REST TIMER ────────────────────────────────────────────────────────────────
+var restIv=null, restRem=0, restTot=0;
+function startRest(exId) {
+  var nm=exId,sec=90;
+  BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId){nm=e.name;sec=e.restSec;}});});
+  if(restIv){clearInterval(restIv);restIv=null;}
+  restTot=sec;restRem=sec;
+  document.getElementById('restExName').textContent=nm;
+  updRest();
+  document.getElementById('restOverlay').classList.add('open');
+  restIv=setInterval(function(){
+    restRem--;updRest();
+    if(restRem<=0){
+      clearInterval(restIv);restIv=null;
+      if(navigator.vibrate)navigator.vibrate([200,100,200]);
+      setTimeout(function(){document.getElementById('restOverlay').classList.remove('open');toast('Reprends ta serie !');},800);
+    }
+  },1000);
+}
+function updRest() {
+  var off=CIRC*(1-restRem/restTot);
+  document.getElementById('ringProg').style.strokeDashoffset=off;
+  document.getElementById('restNum').textContent=restRem;
+  var d=restRem<=10;
+  document.getElementById('restNum').classList.toggle('danger',d);
+  document.getElementById('ringProg').classList.toggle('danger',d);
+}
+function restSkip(){if(restIv){clearInterval(restIv);restIv=null;}document.getElementById('restOverlay').classList.remove('open');toast("C'est parti !");}
+function restAdd(){restRem+=30;restTot=Math.max(restTot,restRem);updRest();if(!restIv){restIv=setInterval(function(){restRem--;updRest();if(restRem<=0){clearInterval(restIv);restIv=null;setTimeout(function(){document.getElementById('restOverlay').classList.remove('open');toast('Reprends !');},800);}},1000);}}
+
+// ── MODAL INDISPO ─────────────────────────────────────────────────────────────
+var modExId=null;
+function openModal(exId) {
+  modExId=exId;
+  var ex=null;
+  BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId)ex=e;});});
+  if(!ex)return;
+  document.getElementById('modalTitle').textContent=ex.name;
+  document.getElementById('modalSubtitle').textContent='Machine indisponible — choisis un substitut :';
+  var h='';
+  ex.alts.forEach(function(a,i){
+    h+='<div class="alt-option" onclick="repEx(\''+exId+'\','+i+')">'
+      +'<div class="alt-name">'+a.name+'</div>'
+      +'<div class="alt-detail">'+a.detail+'</div>'
+      +'</div>';
+  });
+  document.getElementById('modalOptions').innerHTML=h;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function repEx(exId,ai){
+  var ex=null;
+  BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId)ex=e;});});
+  if(!ex)return;
+  var alt=ex.alts[ai];
+  var card=document.getElementById('card-'+exId);
+  if(card){card.querySelector('.exercise-name').textContent=alt.name;card.classList.remove('unavailable');}
+  state.unavailable[exId]=false;closeModal();toast('Remplace par : '+alt.name);
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');modExId=null;}
+document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('weekModal').addEventListener('click',function(e){if(e.target===this)closeWeekModal();});
+
+// ── TOAST & NAV ───────────────────────────────────────────────────────────────
+function toast(msg,isErr) {
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.toggle('err',!!isErr);
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2500);
+}
+function showPage(p) {
+  document.getElementById('pageWorkout').classList.toggle('active',p==='workout');
+  document.getElementById('pageStats').classList.toggle('active',p==='stats');
+  document.getElementById('navWorkout').classList.toggle('active',p==='workout');
+  document.getElementById('navStats').classList.toggle('active',p==='stats');
+  if(p==='stats') renderStats();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadData().then(function() {
+  renderDayStrip();
+  renderSession();
+  document.getElementById('loadingOverlay').style.display='none';
+}).catch(function(e) {
+  document.getElementById('loadingOverlay').style.display='none';
+  toast('Erreur connexion Supabase', true);
+  renderDayStrip();
+  renderSession();
+});
+</script>
+</body>
+</html>
