@@ -149,6 +149,16 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 .pr-icon{font-size:24px;}
 .pr-info .pr-ex{font-weight:600;font-size:14px;}
 .pr-info .pr-val{font-size:12px;color:var(--accent);margin-top:2px;}
+/* CONFIRM MODAL */
+.confirm-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);z-index:300;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.confirm-modal-overlay.open{opacity:1;pointer-events:all;}
+.confirm-modal{background:var(--dark);border:1px solid var(--border);border-radius:20px;padding:28px 24px;width:100%;max-width:360px;}
+.confirm-icon{font-size:36px;text-align:center;margin-bottom:12px;}
+.confirm-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;text-align:center;margin-bottom:8px;color:var(--accent2);}
+.confirm-body{font-size:14px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:24px;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-yes{flex:1;background:var(--danger);color:white;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;cursor:pointer;}
+.confirm-no{flex:1;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:14px;cursor:pointer;}
 /* LOADING */
 .loading-overlay{position:fixed;inset:0;background:var(--black);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 .loading-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:6px;color:var(--accent);}
@@ -244,6 +254,19 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- CONFIRM OVERWRITE MODAL -->
+<div class="confirm-modal-overlay" id="confirmModal">
+  <div class="confirm-modal">
+    <div class="confirm-icon">&#9888;&#65039;</div>
+    <div class="confirm-title">Seance deja enregistree</div>
+    <div class="confirm-body">Une seance existe deja pour ce jour cette semaine.<br>Veux-tu <strong style="color:var(--danger)">ecraser</strong> les donnees existantes ?</div>
+    <div class="confirm-btns">
+      <button class="confirm-no" onclick="cancelOverwrite()">NON</button>
+      <button class="confirm-yes" onclick="confirmOverwrite()">OUI, ECRASER</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ── CONFIG SUPABASE ───────────────────────────────────────────────────────────
@@ -435,6 +458,40 @@ function loadData() {
 }
 
 function saveSession() {
+  var di = state.currentDay;
+  // Garde-fou : verifier si une seance existe deja pour ce jour/semaine
+  var existing = state.allSessions.filter(function(s) {
+    return s.week_num === state.currentWeek && s.day_index === di;
+  });
+  if (existing.length > 0) {
+    document.getElementById('confirmModal').classList.add('open');
+    return;
+  }
+  doSaveSession();
+}
+
+function confirmOverwrite() {
+  document.getElementById('confirmModal').classList.remove('open');
+  var di = state.currentDay;
+  // Supprimer l'ancienne seance et ses sets
+  var existing = state.allSessions.filter(function(s) {
+    return s.week_num === state.currentWeek && s.day_index === di;
+  });
+  var deletePromises = existing.map(function(s) {
+    return supa('sessions?id=eq.'+s.id, {method:'DELETE'});
+  });
+  Promise.all(deletePromises).then(function() {
+    return loadData();
+  }).then(function() {
+    doSaveSession();
+  }).catch(function(e) { toast('Erreur suppression : '+e.message, true); });
+}
+
+function cancelOverwrite() {
+  document.getElementById('confirmModal').classList.remove('open');
+}
+
+function doSaveSession() {
   var di = state.currentDay;
   var prog = getProgram(state.currentWeek)[di];
   var btn = document.getElementById('saveBtn');
@@ -634,7 +691,7 @@ function renderStats() {
   state.allSets.forEach(function(s) {
     var key = s.exercise_id;
     var w = parseFloat(s.weight)||0;
-    if (!prs[key] || w > prs[key].weight) prs[key] = {name: s.exercise_name, weight: w, reps: s.reps};
+    if (s.reps && (!prs[key] || w > prs[key].weight)) prs[key] = {name: s.exercise_name, weight: w, reps: s.reps};
   });
   var prKeys = Object.keys(prs).filter(function(k){return prs[k].weight>0;}).sort(function(a,b){return prs[b].weight-prs[a].weight;}).slice(0,4);
   var prHtml = '<div class="section-title">Records personnels (PR)</div>';
@@ -645,7 +702,7 @@ function renderStats() {
       var pr = prs[k];
       prHtml += '<div class="pr-card"><div class="pr-icon">🏆</div><div class="pr-info">'
                +'<div class="pr-ex">'+pr.name+'</div>'
-               +'<div class="pr-val">'+pr.weight+'kg x '+pr.reps+' reps</div>'
+               +'<div class="pr-val">'+pr.weight+'kg x '+(pr.reps||'?')+' reps</div>'
                +'</div></div>';
     });
   }
@@ -668,7 +725,8 @@ function renderStats() {
     weekNums.forEach(function(w) {
       var v = volByWeek[w]||0;
       var h = Math.round((v/maxVol)*80);
-      chartHtml += '<div class="bar-wrap"><div class="bar" style="height:'+h+'px"></div><div class="bar-lbl">S'+w+'</div></div>';
+      var barH = weekNums.length === 1 ? 60 : Math.max(4, Math.round((v/maxVol)*72));
+      chartHtml += '<div class="bar-wrap"><div class="bar" style="height:'+barH+'px"></div><div class="bar-lbl">S'+w+'</div></div>';
     });
   }
   chartHtml += '</div></div>';
