@@ -66,6 +66,24 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 .mini-input::-webkit-inner-spin-button,.mini-input::-webkit-outer-spin-button{-webkit-appearance:none;}
 .add-set-btn{background:var(--dark);border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);font-size:22px;cursor:pointer;flex:1;min-width:50px;max-width:60px;display:flex;align-items:center;justify-content:center;min-height:88px;}
 .add-set-btn:active{border-color:var(--accent);color:var(--accent);}
+.hist-toggle{width:calc(100% - 32px);margin:0 16px 0;background:none;border:none;border-top:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:10px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.hist-toggle:active{color:var(--accent);}
+.hist-panel{padding:0 16px 14px;display:none;}
+.hist-panel.open{display:block;}
+.hist-session-block{margin-bottom:10px;}
+.hist-session-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.hist-session-label .hist-week{background:var(--dark);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:9px;}
+.hist-sets-row{display:flex;gap:6px;flex-wrap:wrap;}
+.hist-set-chip{background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px;}
+.hist-set-chip .hsc-reps{font-weight:700;color:var(--text);font-size:13px;}
+.hist-set-chip .hsc-kg{font-size:10px;color:var(--muted);}
+.hist-set-chip.pr{border-color:rgba(232,255,71,0.4);}
+.hist-set-chip.pr .hsc-reps{color:var(--accent);}
+.hist-empty{font-size:12px;color:var(--muted);font-style:italic;padding:4px 0;}
+.hist-trend{font-size:11px;margin-left:auto;font-weight:600;}
+.hist-trend.up{color:var(--success);}
+.hist-trend.down{color:var(--danger);}
+.hist-trend.same{color:var(--muted);}
 .session-footer{margin:8px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;}
 .footer-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;}
 .feeling-row{display:flex;gap:8px;margin-bottom:16px;}
@@ -560,6 +578,73 @@ function getCoachSuggestion(exId, defWeight, defReps) {
   return {weight: maxW, reps: Math.min(avgR+1, defReps), isNew: false, msg: 'Maintiens, +1 rep vise'};
 }
 
+function getExHistory(exId) {
+  // Get sessions sorted by date desc, find sets for this exercise
+  var result = [];
+  var seen = 0;
+  var sortedSessions = state.allSessions.slice().sort(function(a,b){
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+  for (var i = 0; i < sortedSessions.length && seen < 2; i++) {
+    var ses = sortedSessions[i];
+    var sesSets = state.allSets.filter(function(s){
+      return s.session_id === ses.id && s.exercise_id === exId && s.reps;
+    }).sort(function(a,b){ return a.set_index - b.set_index; });
+    if (sesSets.length > 0) {
+      var d = new Date(ses.created_at);
+      var label = d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) + ' — Sem.'+ses.week_num;
+      result.push({label: label, sets: sesSets});
+      seen++;
+    }
+  }
+  return result;
+}
+
+function renderHistPanel(exId) {
+  var history = getExHistory(exId);
+  if (!history.length) {
+    return '<div class="hist-empty">Aucun historique pour cet exercice.</div>';
+  }
+  var h = '';
+  history.forEach(function(block, bi) {
+    var maxW = Math.max.apply(null, block.sets.map(function(s){return parseFloat(s.weight)||0;}));
+    // Trend vs previous block
+    var trend = '';
+    if (bi === 0 && history.length > 1) {
+      var prevMax = Math.max.apply(null, history[1].sets.map(function(s){return parseFloat(s.weight)||0;}));
+      if (maxW > prevMax) trend = '<span class="hist-trend up">+' + (maxW-prevMax) + 'kg &#8593;</span>';
+      else if (maxW < prevMax) trend = '<span class="hist-trend down">-' + (prevMax-maxW) + 'kg &#8595;</span>';
+      else trend = '<span class="hist-trend same">= stable</span>';
+    }
+    h += '<div class="hist-session-block">'
+        +'<div class="hist-session-label">'
+          +'<span class="hist-week">'+block.label+'</span>'
+          +trend
+        +'</div>'
+        +'<div class="hist-sets-row">';
+    block.sets.forEach(function(s) {
+      var isPR = parseFloat(s.weight) === maxW && maxW > 0;
+      h += '<div class="hist-set-chip'+(isPR?' pr':'')+'">'
+          +'<span class="hsc-reps">'+(s.reps||'?')+'</span>'
+          +'<span class="hsc-kg">'+(parseFloat(s.weight)>0 ? s.weight+'kg' : 'PC')+'</span>'
+          +'</div>';
+    });
+    h += '</div></div>';
+  });
+  return h;
+}
+
+function toggleHist(exId) {
+  var panel = document.getElementById('hist-'+exId);
+  var btn   = document.getElementById('histbtn-'+exId);
+  if (!panel) return;
+  var isOpen = panel.classList.toggle('open');
+  btn.innerHTML = isOpen ? '&#9650; Masquer historique' : '&#9660; Voir historique (2 dernieres seances)';
+  if (isOpen && panel.innerHTML.trim() === '') {
+    panel.innerHTML = renderHistPanel(exId);
+  }
+}
+
 function isDone(dayIdx) {
   return state.allSessions.some(function(s) {
     return s.week_num === state.currentWeek && s.day_index === dayIdx;
@@ -632,7 +717,10 @@ function renderSession() {
           +'<div class="sets-grid" id="sets-'+ex.id+'">';
     sets.forEach(function(s,i) { h += mkSet(ex.id,i,s,c); });
     h += '<button class="add-set-btn" onclick="addSet(\''+ex.id+'\')">+</button>'
-        +'</div></div></div>';
+        +'</div></div>'
+        +'<button class="hist-toggle" id="histbtn-'+ex.id+'" onclick="toggleHist(\''+ex.id+'\')">▼ Voir historique (2 dernieres seances)</button>'
+        +'<div class="hist-panel" id="hist-'+ex.id+'"></div>'
+        +'</div>';
   });
 
   var feel = state.currentFeeling;
