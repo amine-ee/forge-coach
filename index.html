@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -200,12 +201,14 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 </div>
 
 <!-- PAGE SEANCE -->
+
 <div class="page active" id="pageWorkout">
   <div class="days-strip" id="dayStrip"></div>
   <div id="sessionContent"></div>
 </div>
 
 <!-- PAGE STATS -->
+
 <div class="page" id="pageStats">
   <div class="stats-header">
     <div class="stats-title">Progression</div>
@@ -219,6 +222,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 </div>
 
 <!-- BOTTOM NAV -->
+
 <div class="bottom-nav">
   <div class="nav-item active" id="navWorkout" onclick="showPage('workout')">
     <div class="nav-icon">&#127947;</div>
@@ -231,6 +235,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 </div>
 
 <!-- REST TIMER -->
+
 <div class="rest-overlay" id="restOverlay">
   <div class="rest-tag">Temps de repos</div>
   <div class="rest-exname" id="restExName"></div>
@@ -251,6 +256,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 </div>
 
 <!-- MODAL INDISPO -->
+
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -262,6 +268,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 </div>
 
 <!-- MODAL SEMAINE INFO -->
+
 <div class="modal-overlay" id="weekModal">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -274,6 +281,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 <div class="toast" id="toast"></div>
 
 <!-- CONFIRM OVERWRITE MODAL -->
+
 <div class="confirm-modal-overlay" id="confirmModal">
   <div class="confirm-modal">
     <div class="confirm-icon">&#9888;&#65039;</div>
@@ -321,9 +329,9 @@ var BASE_PROGRAM = [
       {id:'bench',       name:'Developpe couche',          muscle:'chest',    muscleLabel:'Poitrine',        defaultSets:4,defaultReps:10,defaultWeight:60, restSec:120,
        youtube:'https://www.youtube.com/results?search_query=developpe+couche+technique+musculation',
        alts:[{name:'Developpe incline halteres',detail:'Meme groupe musculaire'},{name:'Pompes lestees',detail:'Si banc indisponible'}]},
-      {id:'incline_db',  name:'Developpe incline halteres',muscle:'chest',    muscleLabel:'Poitrine haute',  defaultSets:3,defaultReps:12,defaultWeight:22, restSec:90,
-       youtube:'https://www.youtube.com/results?search_query=developpe+incline+halteres+technique',
-       alts:[{name:'Developpe incline barre',detail:'Meme mouvement'},{name:'Cables croises haut',detail:'Isolation pectorale'}]},
+      {id:'incline_db',  name:'Developpe incline halteres 30deg',muscle:'chest', muscleLabel:'Poitrine haute', defaultSets:4,defaultReps:10,defaultWeight:20, restSec:90,
+       youtube:'https://www.youtube.com/results?search_query=developpe+incline+30+degres+halteres+poitrine+haute',
+       alts:[{name:'Developpe incline barre',detail:'Meme angle, plus de charge'},{name:'Smith machine incline',detail:'Guidé, bon pour debutant'}]},
       {id:'ohp',         name:'Developpe militaire barre', muscle:'shoulder', muscleLabel:'Epaules',         defaultSets:4,defaultReps:8, defaultWeight:40, restSec:120,
        youtube:'https://www.youtube.com/results?search_query=developpe+militaire+technique+musculation',
        alts:[{name:'Developpe militaire halteres',detail:'Meilleure amplitude'},{name:'Arnold press',detail:'Complet pour les deltoides'}]},
@@ -356,17 +364,17 @@ var BASE_PROGRAM = [
     ]
   },
   {
-    id:'C', name:'PUSH+', subtitle:'Poitrine heavy - Triceps - Abdos',
+    id:'C', name:'PUSH+', subtitle:'Poitrine haute - Triceps - Abdos',
     exercises:[
       {id:'dips',        name:'Dips lestes',               muscle:'chest',    muscleLabel:'Poitrine basse',  defaultSets:4,defaultReps:8, defaultWeight:10, restSec:120,
        youtube:'https://www.youtube.com/results?search_query=dips+lestes+poitrine+technique',
        alts:[{name:'Dips poids du corps',detail:'Sans lest'},{name:'Pec deck machine',detail:'Isolation poitrine basse'}]},
-      {id:'chest_fly',   name:'Ecartes cables croises',    muscle:'chest',    muscleLabel:'Poitrine isol.',  defaultSets:3,defaultReps:15,defaultWeight:15, restSec:60,
-       youtube:'https://www.youtube.com/results?search_query=ecartes+cables+croises+poitrine',
-       alts:[{name:'Ecartes halteres plat',detail:'Bon etirement'},{name:'Pec deck machine',detail:'Finisher guide'}]},
-      {id:'front_raise', name:'Elevations frontales',      muscle:'shoulder', muscleLabel:'Deltoide ant.',   defaultSets:3,defaultReps:12,defaultWeight:10, restSec:60,
-       youtube:'https://www.youtube.com/results?search_query=elevations+frontales+epaules+technique',
-       alts:[{name:'Elevations frontales cable',detail:'Tension constante'},{name:'Incline halteres',detail:'Variante sur banc'}]},
+      {id:'cable_upper', name:'Cable croise bas vers haut', muscle:'chest',   muscleLabel:'Poitrine haute',  defaultSets:4,defaultReps:12,defaultWeight:12, restSec:75,
+       youtube:'https://www.youtube.com/results?search_query=cable+croise+bas+vers+haut+poitrine+haute+technique',
+       alts:[{name:'Ecartes inclines halteres',detail:'Meme cible, sans cable'},{name:'Pec deck incline',detail:'Machine guidee'}]},
+      {id:'incline_push',name:'Pompes pieds sureleves',    muscle:'chest',    muscleLabel:'Poitrine haute',  defaultSets:3,defaultReps:15,defaultWeight:0,  restSec:60,
+       youtube:'https://www.youtube.com/results?search_query=pompes+pieds+sureleves+poitrine+haute+technique',
+       alts:[{name:'Developpe incline leger',detail:'Avec halteres legers'},{name:'Cable fly incline',detail:'Isolation cable'}]},
       {id:'skull',       name:'Skull crusher EZ',          muscle:'triceps',  muscleLabel:'Triceps long',    defaultSets:3,defaultReps:12,defaultWeight:25, restSec:90,
        youtube:'https://www.youtube.com/results?search_query=skull+crusher+triceps+technique',
        alts:[{name:'Extensions haltere tete',detail:'Overhead, bon stretch'},{name:'Triceps poulie corde',detail:'Finisher isolation'}]},
@@ -736,118 +744,122 @@ function renderSession() {
   h += '</div>'
       +'<textarea class="comment-area" placeholder="Commentaire, sensation, douleur..." '
       +'onchange="state.currentComment=this.value">'+(state.currentComment||'')+'</textarea>'
-      +'</div>';
-  h += '<button class="save-btn" id="saveBtn" onclick="saveSession()">&#128190; Enregistrer la seance</button>';
 
-  document.getElementById('sessionContent').innerHTML = h;
+```
+  +'</div>';
+```
+
+h += ‘<button class="save-btn" id="saveBtn" onclick="saveSession()">💾 Enregistrer la seance</button>’;
+
+document.getElementById(‘sessionContent’).innerHTML = h;
 }
 
 function mkSet(exId, i, s, c) {
-  var filled = s.reps || s.weight;
-  var rh = i===0&&c ? c.reps : '';
-  var wh = i===0&&c&&c.weight>0 ? c.weight : '';
-  return '<div class="set-block'+(filled?' filled':'')+'" id="sb-'+exId+'-'+i+'">'
-        +'<div class="set-num">SER. '+(i+1)+'</div>'
-        +'<div class="set-inputs">'
-          +'<div class="mini-input-wrap"><div class="mini-label">REPS</div>'
-          +'<input class="mini-input" type="number" min="1" max="100" value="'+(s.reps||'')+'" placeholder="'+rh+'" '
-          +'oninput="updSet(\''+exId+'\','+i+',\'reps\',this.value)"></div>'
-          +'<div class="mini-input-wrap"><div class="mini-label">KG</div>'
-          +'<input class="mini-input" type="number" min="0" max="300" step="0.5" value="'+(s.weight!==undefined&&s.weight!==null?s.weight:'')+'" placeholder="'+wh+'" '
-          +'oninput="updSet(\''+exId+'\','+i+',\'weight\',this.value)"></div>'
-        +'</div></div>';
+var filled = s.reps || s.weight;
+var rh = i===0&&c ? c.reps : ‘’;
+var wh = i===0&&c&&c.weight>0 ? c.weight : ‘’;
+return ‘<div class="set-block'+(filled?' filled':'')+'" id="sb-'+exId+'-'+i+'">’
++’<div class="set-num">SER. ‘+(i+1)+’</div>’
++’<div class="set-inputs">’
++’<div class="mini-input-wrap"><div class="mini-label">REPS</div>’
++’<input class=“mini-input” type=“number” min=“1” max=“100” value=”’+(s.reps||’’)+’” placeholder=”’+rh+’” ’
++‘oninput=“updSet('’+exId+’',’+i+’,'reps',this.value)”></div>’
++’<div class="mini-input-wrap"><div class="mini-label">KG</div>’
++’<input class=“mini-input” type=“number” min=“0” max=“300” step=“0.5” value=”’+(s.weight!==undefined&&s.weight!==null?s.weight:’’)+’” placeholder=”’+wh+’” ’
++‘oninput=“updSet('’+exId+’',’+i+’,'weight',this.value)”></div>’
++’</div></div>’;
 }
 
 // ── STATS RENDER ──────────────────────────────────────────────────────────────
 
 function renderStats() {
-  var total   = state.allSessions.length;
-  var weeks   = state.currentWeek;
-  var lf      = state.allSessions[0] ? state.allSessions[0].feeling : null;
-  var fe      = lf ? (FEELINGS.filter(function(f){return f.val===lf;})[0]||{}).emoji||'-' : '-';
-  var totalKg = state.allSets.reduce(function(a,s){return a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0);},0);
-  var ass     = total > 0 ? Math.min(100, Math.round((total / (weeks*4))*100)) : 0;
+var total   = state.allSessions.length;
+var weeks   = state.currentWeek;
+var lf      = state.allSessions[0] ? state.allSessions[0].feeling : null;
+var fe      = lf ? (FEELINGS.filter(function(f){return f.val===lf;})[0]||{}).emoji||’-’ : ‘-’;
+var totalKg = state.allSets.reduce(function(a,s){return a+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0);},0);
+var ass     = total > 0 ? Math.min(100, Math.round((total / (weeks*4))*100)) : 0;
 
-  document.getElementById('statsGrid').innerHTML =
-    '<div class="stat-card"><div class="stat-val">'+total+'</div><div class="stat-lbl">Seances</div></div>'+
-    '<div class="stat-card"><div class="stat-val">'+weeks+'</div><div class="stat-lbl">Semaine</div></div>'+
-    '<div class="stat-card"><div class="stat-val">'+fe+'</div><div class="stat-lbl">Dernier ressenti</div></div>'+
-    '<div class="stat-card"><div class="stat-val">'+ass+'%</div><div class="stat-lbl">Assiduite</div></div>';
+document.getElementById(‘statsGrid’).innerHTML =
+‘<div class="stat-card"><div class="stat-val">’+total+’</div><div class="stat-lbl">Seances</div></div>’+
+‘<div class="stat-card"><div class="stat-val">’+weeks+’</div><div class="stat-lbl">Semaine</div></div>’+
+‘<div class="stat-card"><div class="stat-val">’+fe+’</div><div class="stat-lbl">Dernier ressenti</div></div>’+
+‘<div class="stat-card"><div class="stat-val">’+ass+’%</div><div class="stat-lbl">Assiduite</div></div>’;
 
-  // PRs par exercice
-  var prs = {};
-  state.allSets.forEach(function(s) {
-    var key = s.exercise_id;
-    var w = parseFloat(s.weight)||0;
-    if (s.reps && (!prs[key] || w > prs[key].weight)) prs[key] = {name: s.exercise_name, weight: w, reps: s.reps};
-  });
-  var prKeys = Object.keys(prs).filter(function(k){return prs[k].weight>0;}).sort(function(a,b){return prs[b].weight-prs[a].weight;}).slice(0,4);
-  var prHtml = '<div class="section-title">Records personnels (PR)</div>';
-  if (prKeys.length === 0) {
-    prHtml += '<div class="empty-state"><div class="empty-icon">🏆</div><p>Tes records apparaitront ici apres ta premiere seance.</p></div>';
-  } else {
-    prKeys.forEach(function(k) {
-      var pr = prs[k];
-      prHtml += '<div class="pr-card"><div class="pr-icon">🏆</div><div class="pr-info">'
-               +'<div class="pr-ex">'+pr.name+'</div>'
-               +'<div class="pr-val">'+pr.weight+'kg x '+(pr.reps||'?')+' reps</div>'
-               +'</div></div>';
-    });
-  }
-  document.getElementById('prSection').innerHTML = prHtml;
+// PRs par exercice
+var prs = {};
+state.allSets.forEach(function(s) {
+var key = s.exercise_id;
+var w = parseFloat(s.weight)||0;
+if (s.reps && (!prs[key] || w > prs[key].weight)) prs[key] = {name: s.exercise_name, weight: w, reps: s.reps};
+});
+var prKeys = Object.keys(prs).filter(function(k){return prs[k].weight>0;}).sort(function(a,b){return prs[b].weight-prs[a].weight;}).slice(0,4);
+var prHtml = ‘<div class="section-title">Records personnels (PR)</div>’;
+if (prKeys.length === 0) {
+prHtml += ‘<div class="empty-state"><div class="empty-icon">🏆</div><p>Tes records apparaitront ici apres ta premiere seance.</p></div>’;
+} else {
+prKeys.forEach(function(k) {
+var pr = prs[k];
+prHtml += ‘<div class="pr-card"><div class="pr-icon">🏆</div><div class="pr-info">’
++’<div class="pr-ex">’+pr.name+’</div>’
++’<div class="pr-val">’+pr.weight+‘kg x ‘+(pr.reps||’?’)+’ reps</div>’
++’</div></div>’;
+});
+}
+document.getElementById(‘prSection’).innerHTML = prHtml;
 
-  // Volume par semaine (bar chart)
-  var volByWeek = {};
-  state.allSessions.forEach(function(ses) {
-    var w = ses.week_num;
-    if (!volByWeek[w]) volByWeek[w] = 0;
-    var sesSets = state.allSets.filter(function(s){return s.session_id===ses.id;});
-    sesSets.forEach(function(s){ volByWeek[w] += (parseFloat(s.weight)||0)*(parseInt(s.reps)||0); });
-  });
-  var weekNums = Object.keys(volByWeek).map(Number).sort(function(a,b){return a-b;}).slice(-6);
-  var maxVol = Math.max.apply(null, weekNums.map(function(w){return volByWeek[w]||0;})) || 1;
-  var chartHtml = '<div class="chart-wrap"><div class="chart-title">Volume par semaine (kg)</div><div class="chart-bars">';
-  if (weekNums.length === 0) {
-    chartHtml += '<div style="color:var(--muted);font-size:13px;padding:20px 0">Pas encore de donnees</div>';
-  } else {
-    weekNums.forEach(function(w) {
-      var v = volByWeek[w]||0;
-      var h = Math.round((v/maxVol)*80);
-      var barH = weekNums.length === 1 ? 60 : Math.max(4, Math.round((v/maxVol)*72));
-      chartHtml += '<div class="bar-wrap"><div class="bar" style="height:'+barH+'px"></div><div class="bar-lbl">S'+w+'</div></div>';
-    });
-  }
-  chartHtml += '</div></div>';
-  document.getElementById('chartSection').innerHTML = chartHtml;
+// Volume par semaine (bar chart)
+var volByWeek = {};
+state.allSessions.forEach(function(ses) {
+var w = ses.week_num;
+if (!volByWeek[w]) volByWeek[w] = 0;
+var sesSets = state.allSets.filter(function(s){return s.session_id===ses.id;});
+sesSets.forEach(function(s){ volByWeek[w] += (parseFloat(s.weight)||0)*(parseInt(s.reps)||0); });
+});
+var weekNums = Object.keys(volByWeek).map(Number).sort(function(a,b){return a-b;}).slice(-6);
+var maxVol = Math.max.apply(null, weekNums.map(function(w){return volByWeek[w]||0;})) || 1;
+var chartHtml = ‘<div class="chart-wrap"><div class="chart-title">Volume par semaine (kg)</div><div class="chart-bars">’;
+if (weekNums.length === 0) {
+chartHtml += ‘<div style="color:var(--muted);font-size:13px;padding:20px 0">Pas encore de donnees</div>’;
+} else {
+weekNums.forEach(function(w) {
+var v = volByWeek[w]||0;
+var h = Math.round((v/maxVol)*80);
+var barH = weekNums.length === 1 ? 60 : Math.max(4, Math.round((v/maxVol)*72));
+chartHtml += ‘<div class="bar-wrap"><div class="bar" style="height:'+barH+'px"></div><div class="bar-lbl">S’+w+’</div></div>’;
+});
+}
+chartHtml += ‘</div></div>’;
+document.getElementById(‘chartSection’).innerHTML = chartHtml;
 
-  // Historique
-  if (!state.allSessions.length) {
-    document.getElementById('historyList').innerHTML = '<div class="empty-state"><div class="empty-icon">&#127947;</div><p>Lance ta premiere seance !</p></div>';
-    return;
-  }
-  var h = '';
-  state.allSessions.slice(0,20).forEach(function(ses) {
-    var f = FEELINGS.filter(function(x){return x.val===ses.feeling;})[0];
-    var sesSets = state.allSets.filter(function(s){return s.session_id===ses.id;});
-    var grouped = {};
-    sesSets.forEach(function(s){if(!grouped[s.exercise_id])grouped[s.exercise_id]={name:s.exercise_name,sets:[]};grouped[s.exercise_id].sets.push(s);});
-    var setsHtml = '<div class="h-sets">';
-    Object.keys(grouped).forEach(function(k){
-      var g=grouped[k];
-      var maxW=Math.max.apply(null,g.sets.map(function(s){return parseFloat(s.weight)||0;}));
-      setsHtml+='<div class="h-set-chip">'+g.name+': <strong>'+(maxW>0?maxW+'kg':'PC')+'</strong></div>';
-    });
-    setsHtml += '</div>';
-    var d = new Date(ses.created_at);
-    var dl = d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
-    h += '<div class="history-item">'
-        +'<div class="h-top"><div class="h-date">'+dl+' — Sem. '+ses.week_num+'</div><div class="h-feel">'+(f?f.emoji:'')+'</div></div>'
-        +'<div class="h-name">'+ses.session_name+'</div>'
-        +(ses.comment?'<div class="h-comment">'+ses.comment+'</div>':'')
-        +setsHtml
-        +'</div>';
-  });
-  document.getElementById('historyList').innerHTML = h;
+// Historique
+if (!state.allSessions.length) {
+document.getElementById(‘historyList’).innerHTML = ‘<div class="empty-state"><div class="empty-icon">🏋</div><p>Lance ta premiere seance !</p></div>’;
+return;
+}
+var h = ‘’;
+state.allSessions.slice(0,20).forEach(function(ses) {
+var f = FEELINGS.filter(function(x){return x.val===ses.feeling;})[0];
+var sesSets = state.allSets.filter(function(s){return s.session_id===ses.id;});
+var grouped = {};
+sesSets.forEach(function(s){if(!grouped[s.exercise_id])grouped[s.exercise_id]={name:s.exercise_name,sets:[]};grouped[s.exercise_id].sets.push(s);});
+var setsHtml = ‘<div class="h-sets">’;
+Object.keys(grouped).forEach(function(k){
+var g=grouped[k];
+var maxW=Math.max.apply(null,g.sets.map(function(s){return parseFloat(s.weight)||0;}));
+setsHtml+=’<div class="h-set-chip">’+g.name+’: <strong>’+(maxW>0?maxW+‘kg’:‘PC’)+’</strong></div>’;
+});
+setsHtml += ‘</div>’;
+var d = new Date(ses.created_at);
+var dl = d.toLocaleDateString(‘fr-FR’,{weekday:‘short’,day:‘numeric’,month:‘short’});
+h += ‘<div class="history-item">’
++’<div class="h-top"><div class="h-date">’+dl+’ — Sem. ‘+ses.week_num+’</div><div class="h-feel">’+(f?f.emoji:’’)+’</div></div>’
++’<div class="h-name">’+ses.session_name+’</div>’
++(ses.comment?’<div class="h-comment">’+ses.comment+’</div>’:’’)
++setsHtml
++’</div>’;
+});
+document.getElementById(‘historyList’).innerHTML = h;
 }
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
@@ -855,136 +867,137 @@ function renderStats() {
 function switchDay(i) { state.currentDay=i; renderDayStrip(); renderSession(); window.scrollTo(0,0); }
 
 function updSet(exId, si, field, val) {
-  if (!state.currentSets[exId]) state.currentSets[exId] = [{}];
-  while (state.currentSets[exId].length <= si) state.currentSets[exId].push({});
-  state.currentSets[exId][si][field] = val==='' ? undefined : +val;
-  var b = document.getElementById('sb-'+exId+'-'+si);
-  if (b) { var s=state.currentSets[exId][si]; b.classList.toggle('filled',!!(s.reps||s.weight)); }
+if (!state.currentSets[exId]) state.currentSets[exId] = [{}];
+while (state.currentSets[exId].length <= si) state.currentSets[exId].push({});
+state.currentSets[exId][si][field] = val===’’ ? undefined : +val;
+var b = document.getElementById(‘sb-’+exId+’-’+si);
+if (b) { var s=state.currentSets[exId][si]; b.classList.toggle(‘filled’,!!(s.reps||s.weight)); }
 }
 
 function addSet(exId) {
-  if (!state.currentSets[exId]) state.currentSets[exId] = [{}];
-  var idx = state.currentSets[exId].length;
-  state.currentSets[exId].push({});
-  var grid = document.getElementById('sets-'+exId);
-  var c = getCoachSuggestion(exId,10,10);
-  var t = document.createElement('div');
-  t.innerHTML = mkSet(exId,idx,{},c);
-  grid.insertBefore(t.firstElementChild, grid.lastElementChild);
+if (!state.currentSets[exId]) state.currentSets[exId] = [{}];
+var idx = state.currentSets[exId].length;
+state.currentSets[exId].push({});
+var grid = document.getElementById(‘sets-’+exId);
+var c = getCoachSuggestion(exId,10,10);
+var t = document.createElement(‘div’);
+t.innerHTML = mkSet(exId,idx,{},c);
+grid.insertBefore(t.firstElementChild, grid.lastElementChild);
 }
 
 function setFeel(val) {
-  state.currentFeeling = val;
-  document.querySelectorAll('.feeling-btn').forEach(function(b,i){b.classList.toggle('selected',FEELINGS[i].val===val);});
+state.currentFeeling = val;
+document.querySelectorAll(’.feeling-btn’).forEach(function(b,i){b.classList.toggle(‘selected’,FEELINGS[i].val===val);});
 }
 
 function showWeekInfo() {
-  var phase = getPhase(state.currentWeek);
-  var pd = PHASES[phase];
-  var pw = state.currentWeek <= 4 ? state.currentWeek : state.currentWeek <= 8 ? state.currentWeek-4 : state.currentWeek <= 12 ? state.currentWeek-8 : state.currentWeek-12;
-  document.getElementById('weekModalTitle').textContent = pd.emoji+' '+pd.name+' — Semaine '+state.currentWeek;
-  document.getElementById('weekModalBody').innerHTML =
-    '<p style="margin-bottom:12px">'+pd.desc+'</p>'
-    +'<p style="margin-bottom:8px"><strong style="color:var(--text)">Semaine de phase :</strong> '+pw+' / 4</p>'
-    +'<p style="margin-bottom:8px"><strong style="color:var(--text)">Objectif :</strong> Atteindre le physique cible d\'ici juin 2025</p>'
-    +'<p style="margin-bottom:8px"><strong style="color:var(--text)">Plan :</strong><br>'
-    +'&#127807; Sem 1-4 : Accumulation<br>'
-    +'&#9889; Sem 5-8 : Intensification<br>'
-    +'&#128293; Sem 9-12 : Realisation<br>'
-    +'&#127942; Sem 13+ : Pic et maintien</p>';
-  document.getElementById('weekModal').classList.add('open');
+var phase = getPhase(state.currentWeek);
+var pd = PHASES[phase];
+var pw = state.currentWeek <= 4 ? state.currentWeek : state.currentWeek <= 8 ? state.currentWeek-4 : state.currentWeek <= 12 ? state.currentWeek-8 : state.currentWeek-12;
+document.getElementById(‘weekModalTitle’).textContent = pd.emoji+’ ‘+pd.name+’ — Semaine ‘+state.currentWeek;
+document.getElementById(‘weekModalBody’).innerHTML =
+‘<p style="margin-bottom:12px">’+pd.desc+’</p>’
++’<p style="margin-bottom:8px"><strong style="color:var(--text)">Semaine de phase :</strong> ‘+pw+’ / 4</p>’
++’<p style="margin-bottom:8px"><strong style="color:var(--text)">Objectif :</strong> Atteindre le physique cible d'ici juin 2025</p>’
++’<p style="margin-bottom:8px"><strong style="color:var(--text)">Plan :</strong><br>’
++’🌿 Sem 1-4 : Accumulation<br>’
++’⚡ Sem 5-8 : Intensification<br>’
++’🔥 Sem 9-12 : Realisation<br>’
++’🏆 Sem 13+ : Pic et maintien</p>’;
+document.getElementById(‘weekModal’).classList.add(‘open’);
 }
-function closeWeekModal() { document.getElementById('weekModal').classList.remove('open'); }
+function closeWeekModal() { document.getElementById(‘weekModal’).classList.remove(‘open’); }
 
 // ── REST TIMER ────────────────────────────────────────────────────────────────
 var restIv=null, restRem=0, restTot=0;
 function startRest(exId) {
-  var nm=exId,sec=90;
-  BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId){nm=e.name;sec=e.restSec;}});});
-  if(restIv){clearInterval(restIv);restIv=null;}
-  restTot=sec;restRem=sec;
-  document.getElementById('restExName').textContent=nm;
-  updRest();
-  document.getElementById('restOverlay').classList.add('open');
-  restIv=setInterval(function(){
-    restRem--;updRest();
-    if(restRem<=0){
-      clearInterval(restIv);restIv=null;
-      if(navigator.vibrate)navigator.vibrate([200,100,200]);
-      setTimeout(function(){document.getElementById('restOverlay').classList.remove('open');toast('Reprends ta serie !');},800);
-    }
-  },1000);
+var nm=exId,sec=90;
+BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId){nm=e.name;sec=e.restSec;}});});
+if(restIv){clearInterval(restIv);restIv=null;}
+restTot=sec;restRem=sec;
+document.getElementById(‘restExName’).textContent=nm;
+updRest();
+document.getElementById(‘restOverlay’).classList.add(‘open’);
+restIv=setInterval(function(){
+restRem–;updRest();
+if(restRem<=0){
+clearInterval(restIv);restIv=null;
+if(navigator.vibrate)navigator.vibrate([200,100,200]);
+setTimeout(function(){document.getElementById(‘restOverlay’).classList.remove(‘open’);toast(‘Reprends ta serie !’);},800);
+}
+},1000);
 }
 function updRest() {
-  var off=CIRC*(1-restRem/restTot);
-  document.getElementById('ringProg').style.strokeDashoffset=off;
-  document.getElementById('restNum').textContent=restRem;
-  var d=restRem<=10;
-  document.getElementById('restNum').classList.toggle('danger',d);
-  document.getElementById('ringProg').classList.toggle('danger',d);
+var off=CIRC*(1-restRem/restTot);
+document.getElementById(‘ringProg’).style.strokeDashoffset=off;
+document.getElementById(‘restNum’).textContent=restRem;
+var d=restRem<=10;
+document.getElementById(‘restNum’).classList.toggle(‘danger’,d);
+document.getElementById(‘ringProg’).classList.toggle(‘danger’,d);
 }
-function restSkip(){if(restIv){clearInterval(restIv);restIv=null;}document.getElementById('restOverlay').classList.remove('open');toast("C'est parti !");}
-function restAdd(){restRem+=30;restTot=Math.max(restTot,restRem);updRest();if(!restIv){restIv=setInterval(function(){restRem--;updRest();if(restRem<=0){clearInterval(restIv);restIv=null;setTimeout(function(){document.getElementById('restOverlay').classList.remove('open');toast('Reprends !');},800);}},1000);}}
+function restSkip(){if(restIv){clearInterval(restIv);restIv=null;}document.getElementById(‘restOverlay’).classList.remove(‘open’);toast(“C’est parti !”);}
+function restAdd(){restRem+=30;restTot=Math.max(restTot,restRem);updRest();if(!restIv){restIv=setInterval(function(){restRem–;updRest();if(restRem<=0){clearInterval(restIv);restIv=null;setTimeout(function(){document.getElementById(‘restOverlay’).classList.remove(‘open’);toast(‘Reprends !’);},800);}},1000);}}
 
 // ── MODAL INDISPO ─────────────────────────────────────────────────────────────
 var modExId=null;
 function openModal(exId) {
-  modExId=exId;
-  var ex=null;
-  BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId)ex=e;});});
-  if(!ex)return;
-  document.getElementById('modalTitle').textContent=ex.name;
-  document.getElementById('modalSubtitle').textContent='Machine indisponible — choisis un substitut :';
-  var h='';
-  ex.alts.forEach(function(a,i){
-    h+='<div class="alt-option" onclick="repEx(\''+exId+'\','+i+')">'
-      +'<div class="alt-name">'+a.name+'</div>'
-      +'<div class="alt-detail">'+a.detail+'</div>'
-      +'</div>';
-  });
-  document.getElementById('modalOptions').innerHTML=h;
-  document.getElementById('modalOverlay').classList.add('open');
+modExId=exId;
+var ex=null;
+BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId)ex=e;});});
+if(!ex)return;
+document.getElementById(‘modalTitle’).textContent=ex.name;
+document.getElementById(‘modalSubtitle’).textContent=‘Machine indisponible — choisis un substitut :’;
+var h=’’;
+ex.alts.forEach(function(a,i){
+h+=’<div class="alt-option" onclick="repEx(\''+exId+'\','+i+')">’
++’<div class="alt-name">’+a.name+’</div>’
++’<div class="alt-detail">’+a.detail+’</div>’
++’</div>’;
+});
+document.getElementById(‘modalOptions’).innerHTML=h;
+document.getElementById(‘modalOverlay’).classList.add(‘open’);
 }
 function repEx(exId,ai){
-  var ex=null;
-  BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId)ex=e;});});
-  if(!ex)return;
-  var alt=ex.alts[ai];
-  var card=document.getElementById('card-'+exId);
-  if(card){card.querySelector('.exercise-name').textContent=alt.name;card.classList.remove('unavailable');}
-  state.unavailable[exId]=false;closeModal();toast('Remplace par : '+alt.name);
+var ex=null;
+BASE_PROGRAM.forEach(function(p){p.exercises.forEach(function(e){if(e.id===exId)ex=e;});});
+if(!ex)return;
+var alt=ex.alts[ai];
+var card=document.getElementById(‘card-’+exId);
+if(card){card.querySelector(’.exercise-name’).textContent=alt.name;card.classList.remove(‘unavailable’);}
+state.unavailable[exId]=false;closeModal();toast(’Remplace par : ’+alt.name);
 }
-function closeModal(){document.getElementById('modalOverlay').classList.remove('open');modExId=null;}
-document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.getElementById('weekModal').addEventListener('click',function(e){if(e.target===this)closeWeekModal();});
+function closeModal(){document.getElementById(‘modalOverlay’).classList.remove(‘open’);modExId=null;}
+document.getElementById(‘modalOverlay’).addEventListener(‘click’,function(e){if(e.target===this)closeModal();});
+document.getElementById(‘weekModal’).addEventListener(‘click’,function(e){if(e.target===this)closeWeekModal();});
 
 // ── TOAST & NAV ───────────────────────────────────────────────────────────────
 function toast(msg,isErr) {
-  var t=document.getElementById('toast');
-  t.textContent=msg;
-  t.classList.toggle('err',!!isErr);
-  t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2500);
+var t=document.getElementById(‘toast’);
+t.textContent=msg;
+t.classList.toggle(‘err’,!!isErr);
+t.classList.add(‘show’);
+setTimeout(function(){t.classList.remove(‘show’);},2500);
 }
 function showPage(p) {
-  document.getElementById('pageWorkout').classList.toggle('active',p==='workout');
-  document.getElementById('pageStats').classList.toggle('active',p==='stats');
-  document.getElementById('navWorkout').classList.toggle('active',p==='workout');
-  document.getElementById('navStats').classList.toggle('active',p==='stats');
-  if(p==='stats') renderStats();
+document.getElementById(‘pageWorkout’).classList.toggle(‘active’,p===‘workout’);
+document.getElementById(‘pageStats’).classList.toggle(‘active’,p===‘stats’);
+document.getElementById(‘navWorkout’).classList.toggle(‘active’,p===‘workout’);
+document.getElementById(‘navStats’).classList.toggle(‘active’,p===‘stats’);
+if(p===‘stats’) renderStats();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 loadData().then(function() {
-  renderDayStrip();
-  renderSession();
-  document.getElementById('loadingOverlay').style.display='none';
+renderDayStrip();
+renderSession();
+document.getElementById(‘loadingOverlay’).style.display=‘none’;
 }).catch(function(e) {
-  document.getElementById('loadingOverlay').style.display='none';
-  toast('Erreur connexion Supabase', true);
-  renderDayStrip();
-  renderSession();
+document.getElementById(‘loadingOverlay’).style.display=‘none’;
+toast(‘Erreur connexion Supabase’, true);
+renderDayStrip();
+renderSession();
 });
 </script>
+
 </body>
 </html>
