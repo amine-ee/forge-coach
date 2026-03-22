@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -987,13 +986,23 @@ if(p===‘stats’) renderStats();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+var loadTimeout = setTimeout(function() {
+// Si Supabase ne repond pas en 6s, on affiche quand meme l’app
+document.getElementById(‘loadingOverlay’).style.display=‘none’;
+toast(‘Mode hors-ligne — donnees non chargees’, true);
+renderDayStrip();
+renderSession();
+}, 6000);
+
 loadData().then(function() {
+clearTimeout(loadTimeout);
 renderDayStrip();
 renderSession();
 document.getElementById(‘loadingOverlay’).style.display=‘none’;
 }).catch(function(e) {
+clearTimeout(loadTimeout);
 document.getElementById(‘loadingOverlay’).style.display=‘none’;
-toast(‘Erreur connexion Supabase’, true);
+toast(’Erreur connexion : ’ + e.message, true);
 renderDayStrip();
 renderSession();
 });
