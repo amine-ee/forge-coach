@@ -15,8 +15,12 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 .header{padding:20px 20px 16px;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,10,10,0.95);backdrop-filter:blur(12px);z-index:100;}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:var(--accent);line-height:1;}
 .logo span{color:var(--text);}
-.week-badge{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);background:var(--card);padding:6px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;}
+.week-nav{display:flex;align-items:center;gap:6px;}
+.week-badge{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);background:var(--card);padding:6px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;min-width:90px;text-align:center;}
 .week-badge:active{border-color:var(--accent);}
+.week-nav-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;flex-shrink:0;transition:all 0.2s;}
+.week-nav-btn:active{border-color:var(--accent);color:var(--accent);}
+.week-nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
 .days-strip{display:flex;gap:8px;padding:16px 20px;overflow-x:auto;scrollbar-width:none;}
 .days-strip::-webkit-scrollbar{display:none;}
 .day-tab{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:10px 14px;border-radius:14px;background:var(--card);border:1.5px solid var(--border);transition:all 0.2s;min-width:68px;}
@@ -196,7 +200,11 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 
 <div class="header">
   <div class="logo">FORGE<span>.</span></div>
-  <div class="week-badge" id="weekBadge" onclick="showWeekInfo()">Semaine 1</div>
+  <div class="week-nav">
+    <button class="week-nav-btn" id="weekPrev" onclick="changeWeek(-1)">&#8592;</button>
+    <div class="week-badge" id="weekBadge" onclick="showWeekInfo()">Semaine 1</div>
+    <button class="week-nav-btn" id="weekNext" onclick="changeWeek(1)">&#8594;</button>
+  </div>
 </div>
 
 <!-- PAGE SEANCE -->
@@ -672,6 +680,28 @@ function renderDayStrip() {
   }
   document.getElementById('dayStrip').innerHTML = h;
   document.getElementById('weekBadge').textContent = 'Semaine '+state.currentWeek;
+  var prevBtn = document.getElementById('weekPrev');
+  if (prevBtn) prevBtn.disabled = state.currentWeek <= 1;
+}
+
+function changeWeek(delta) {
+  var newWeek = state.currentWeek + delta;
+  if (newWeek < 1) return;
+  state.currentWeek = newWeek;
+  state.currentDay = 0;
+  state.currentSets = {};
+  state.currentFeeling = null;
+  state.currentComment = '';
+  // Update prev button disabled state
+  var prevBtn = document.getElementById('weekPrev');
+  if (prevBtn) prevBtn.disabled = newWeek <= 1;
+  renderDayStrip();
+  renderSession();
+  window.scrollTo(0, 0);
+  // Show a subtle toast indicating the week
+  var phase = getPhase(newWeek);
+  var pd = PHASES[phase];
+  toast('Semaine ' + newWeek + ' — ' + pd.name);
 }
 
 function renderSession() {
