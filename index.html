@@ -70,6 +70,20 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 .mini-input::-webkit-inner-spin-button,.mini-input::-webkit-outer-spin-button{-webkit-appearance:none;}
 .add-set-btn{background:var(--dark);border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);font-size:22px;cursor:pointer;flex:1;min-width:50px;max-width:60px;display:flex;align-items:center;justify-content:center;min-height:88px;}
 .add-set-btn:active{border-color:var(--accent);color:var(--accent);}
+.gif-panel{padding:0 16px 14px;display:none;}
+.gif-panel.open{display:block;}
+.gif-wrap{border-radius:12px;overflow:hidden;background:var(--dark);border:1px solid var(--border);margin-bottom:8px;}
+.gif-wrap img{width:100%;display:block;max-height:220px;object-fit:cover;}
+.gif-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:8px 12px;background:var(--dark);border-top:1px solid var(--border);}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.lightbox.open{opacity:1;pointer-events:all;}
+.lightbox img{max-width:100%;max-height:70vh;border-radius:16px;object-fit:contain;}
+.lightbox-label{font-size:13px;font-weight:600;color:var(--text);margin-top:16px;text-align:center;}
+.lightbox-close{margin-top:20px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;padding:12px 32px;border-radius:50px;cursor:pointer;}
+.gif-wrap{cursor:pointer;}
+.gif-wrap:active{opacity:0.8;}
+.gif-toggle{width:calc(100% - 32px);margin:0 16px 0;background:none;border:none;border-top:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:10px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.gif-toggle:active{color:var(--accent);}
 .hist-toggle{width:calc(100% - 32px);margin:0 16px 0;background:none;border:none;border-top:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:10px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
 .hist-toggle:active{color:var(--accent);}
 .hist-panel{padding:0 16px 14px;display:none;}
@@ -281,6 +295,13 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 
 <div class="toast" id="toast"></div>
 
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-label" id="lightboxLabel"></div>
+  <button class="lightbox-close" onclick="closeLightbox()">Fermer</button>
+</div>
+
 <!-- CONFIRM OVERWRITE MODAL -->
 <div class="confirm-modal-overlay" id="confirmModal">
   <div class="confirm-modal">
@@ -455,6 +476,8 @@ var state = {
   allSets: [],       // loaded from supabase
   phaseInfo: null
 };
+
+var GIF_MAP = {"bench": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg", "Developpe couche barre", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Bench_Press/0.jpg", "Developpe couche halteres", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Push-Ups/0.jpg", "Pompes"], "incline_db": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Incline_Bench_Press/0.jpg", "Incline halteres 30deg", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Incline_Bench_Press_-_Medium_Grip/0.jpg", "Incline barre", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Crossover/0.jpg", "Cable croise haut"], "ohp": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Shoulder_Press/0.jpg", "Developpe militaire barre", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Shoulder_Press/0.jpg", "Militaire halteres", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Arnold_Dumbbell_Press/0.jpg", "Arnold press"], "lat_raise": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Lateral_Raise/0.jpg", "Elevations laterales", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Lateral_Raise/0.jpg", "Elevations cable", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Lateral_Raise/0.jpg", "Machine epaules"], "triceps_push": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/0.jpg", "Triceps poulie haute", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dips_-_Triceps_Version/0.jpg", "Dips paralleles", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Triceps_Press/0.jpg", "Extensions haltere"], "pullup": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pull-up/0.jpg", "Tractions", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Wide-Grip_Lat_Pulldown/0.jpg", "Tirage vertical machine", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Wide-Grip_Lat_Pulldown/0.jpg", "Tirage poulie haute"], "row_cable": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Cable_Rows/0.jpg", "Tirage horizontal cable", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_One-Arm_Long_Bar_Row/0.jpg", "Rowing haltere 1 bras", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/0.jpg", "Rowing barre"], "facepull": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Rear_Delt_Row/0.jpg", "Face pull cable", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Rear_Delt_Fly/0.jpg", "Oiseau halteres", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Rear_Delt_Fly/0.jpg", "Ecartes machine"], "curl_bar": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/EZ-Bar_Curl/0.jpg", "Curl barre EZ", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Alternate_Bicep_Curl/0.jpg", "Curl halteres alternes", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Hammer_Curl_with_Rope/0.jpg", "Curl cable bas"], "hammer": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hammer_Curl/0.jpg", "Hammer curl", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Hammer_Curl_with_Rope/0.jpg", "Curl cable corde", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hammer_Curl/0.jpg", "Curl marteau machine"], "dips": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dips_-_Chest_Version/0.jpg", "Dips lestes", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dips_-_Chest_Version/0.jpg", "Dips poids du corps", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pec_Deck_Fly/0.jpg", "Pec deck machine"], "cable_upper": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Crossover/0.jpg", "Cable croise bas vers haut", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Incline_Fly/0.jpg", "Ecartes inclines halteres", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pec_Deck_Fly/0.jpg", "Pec deck incline"], "incline_push": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Push-up/0.jpg", "Pompes pieds sureleves", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Incline_Bench_Press/0.jpg", "Developpe incline leger", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Crossover/0.jpg", "Cable fly incline"], "skull": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/EZ-Bar_Skullcrusher/0.jpg", "Skull crusher EZ", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Triceps_Press/0.jpg", "Extensions haltere tete", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/0.jpg", "Triceps poulie corde"], "abs_planche": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Plank/0.jpg", "Gainage", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Ab_Wheel_Rollout/0.jpg", "Ab roller", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Crunch/0.jpg", "Crunchs cable"], "deadlift": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Romanian_Deadlift/0.jpg", "Souleve de terre roumain", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Good_Morning/0.jpg", "Good morning", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Back_Extension/0.jpg", "Extension dos machine"], "row_machine": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Cable_Rows/0.jpg", "Rowing machine", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/T-Bar_Row_with_Handle/0.jpg", "T-bar row", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/0.jpg", "Rowing haltere penche"], "shrug": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Shrug/0.jpg", "Shrugs halteres", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Shrug/0.jpg", "Shrugs barre", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Shrug/0.jpg", "Shrugs cable"], "curl_machine": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Concentration_Curl/0.jpg", "Curl concentration", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Preacher_Curl/0.jpg", "Curl pupitre haltere", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Hammer_Curl_with_Rope/0.jpg", "Curl cable supination"], "abs_hanging": ["https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hanging_Leg_Raise/0.jpg", "Releves jambes suspendu", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Flat_Bench_Lying_Leg_Raise/0.jpg", "Releves jambes sol", "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Reverse_Crunch/0.jpg", "Crunchs inverses"]};
 
 var CIRC = 2 * Math.PI * 88;
 
@@ -642,6 +665,56 @@ function renderHistPanel(exId) {
   return h;
 }
 
+function openLightbox(src, label) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxLabel').textContent = label;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightboxImg').src = '';
+}
+
+function makeGifWrap(src, label) {
+  var d = document.createElement('div');
+  d.className = 'gif-wrap';
+  d.title = 'Agrandir';
+  d.onclick = function() { openLightbox(src, label); };
+  var img = document.createElement('img');
+  img.src = src;
+  img.alt = label;
+  img.loading = 'lazy';
+  img.onerror = function() { this.parentNode.style.display = 'none'; };
+  var lbl = document.createElement('div');
+  lbl.className = 'gif-label';
+  lbl.textContent = label + ' — appuie pour agrandir';
+  d.appendChild(img);
+  d.appendChild(lbl);
+  return d;
+}
+
+function toggleGif(exId) {
+  var panel = document.getElementById('gif-'+exId);
+  var btn   = document.getElementById('gifbtn-'+exId);
+  if (!panel) return;
+  var isOpen = panel.classList.toggle('open');
+  btn.innerHTML = isOpen ? '&#9650; Masquer le mouvement' : '&#127916; Voir le mouvement';
+  if (isOpen && panel.innerHTML.trim() === '') {
+    var gifs = GIF_MAP[exId];
+    if (!gifs) { panel.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--muted)">GIF non disponible</div>'; return; }
+    panel.appendChild(makeGifWrap(gifs[0], gifs[1]));
+    if (gifs[2]) {
+      var altLbl = document.createElement('div');
+      altLbl.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:4px 0 6px';
+      altLbl.textContent = 'Alternatives :';
+      panel.appendChild(altLbl);
+      panel.appendChild(makeGifWrap(gifs[2], gifs[3]));
+    }
+    if (gifs[4]) panel.appendChild(makeGifWrap(gifs[4], gifs[5]));
+  }
+}
+
 function toggleHist(exId) {
   var panel = document.getElementById('hist-'+exId);
   var btn   = document.getElementById('histbtn-'+exId);
@@ -748,6 +821,8 @@ function renderSession() {
     sets.forEach(function(s,i) { h += mkSet(ex.id,i,s,c); });
     h += '<button class="add-set-btn" onclick="addSet(\''+ex.id+'\')">+</button>'
         +'</div></div>'
+        +'<button class="gif-toggle" id="gifbtn-'+ex.id+'" onclick="toggleGif(\''+ex.id+'\')">&#127916; Voir le mouvement</button>'
+        +'<div class="gif-panel" id="gif-'+ex.id+'"></div>'
         +'<button class="hist-toggle" id="histbtn-'+ex.id+'" onclick="toggleHist(\''+ex.id+'\')">▼ Voir historique (2 dernieres seances)</button>'
         +'<div class="hist-panel" id="hist-'+ex.id+'"></div>'
         +'</div>';
